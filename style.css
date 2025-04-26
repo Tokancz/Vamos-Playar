@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+
+:root {
+    --primary: #FFFFFF90;
+    --accent: #C04065;
+    --white: #e8e7e7;
+    --backdrop: #20202080;
+
+}
+* {
+    font-family: "Source Code Pro", monospace;
+    font-size: 1.3em;
+    text-align: center;
+}
+body {
+    width: 100%;
+
+    background: linear-gradient(180deg,rgba(0, 0, 0, 0) 0%, rgba(10, 10, 10, 0.4) 100%), url(./BlindingLights.jpg);
+    background-repeat: no-repeat;
+    background-size: 130%;
+    backdrop-filter: blur(30px);
+
+    color: var(--white);
+}
+main {
+    width: 100%;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+i#X {
+    position: absolute;
+    top: 30px;
+    left: 50px;
+    font-size: 2em;
+    transition: .3s;
+}
+main > h1 {
+    font-size: 2.5em;
+    font-weight: 600;
+}
+main p, span{
+    color: var(--primary);
+}
+main i:hover {
+    color: #FFFFFF;
+    transform: scale(1.1);
+}
+img.album_cover {
+    width: 500px;
+    height: 500px;
+
+    border-radius: 10px;
+}
+section.detail {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    background-color: var(--backdrop);
+    padding: 20px;
+    border-radius: 20px;
+}
+section.slider {
+    width: 90%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 10px;
+}
+section.slider p {
+    font-size: .75em;
+}
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 200px;
+    border-radius: 3px;
+    background: var(--white);
+    outline: none;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 8px;
+    border-radius: 5px;
+    background: transparent;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 2px solid var(--accent);
+    cursor: pointer;
+    margin-top: -6px;
+}
+section.icons {
+    width:70%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+section.icons i {
+    font-size: 1.8em;
+    transition: .3s;
+}
+i#pause, i#play {
+    font-size: 2.5em;
+}
+
+@media (width <= 1024px) {
+    img.album_cover {width: 400px; height: 400px;}
+}
+@media (width <= 425px) {
+    * { font-size: 1em; }
+    body { background-size: 200%;}
+    img.album_cover { width: 350px; height: 350px; }
+    i#X { left: 30px; }
+}
+@media (width <= 320px) {
+    body { background-size: 250%;}
+    img.album_cover { width: 300px; height: 300px; }
+    section.detail { padding: 10px;}
+}
