@@ -164,7 +164,9 @@ slider.addEventListener("change", seekSong);
 cross.addEventListener("click", triggerAnimation);
 
 // No auto play on page load
-loadSong(currentSongIndex, false);
+loadSong(currentSong, false);
 updateMusic();
 updateGradient();
 setInterval(updateMusic, 500); // Update every second
+
+//Todo: volume slider
