@@ -11,92 +11,26 @@
 </head>
 <body>
     <main>
-        <img src="BlindingLights.jpg" alt="" class="album_cover" draggable="false">
+        <img src="BlindingLights.jpg" alt="" class="album_cover" id="coverImage" draggable="false">
         <i class="fa-solid fa-xmark" id="X"></i>
-        <h1>Blinding Lights</h1>
+        <h1 id="songTitle"></h1>
         <section class="detail">
-            <p>AGONY, kyoto, overrated</p>
+            <p id="artists"></p>
             <section class="slider">
-                <span id="cur_time">0:00</span>
-                <input type="range" id="slider" min="0" max="100" value="50">
-                <span id="duration">6:66</span>
+                <span id="cur_time"></span>
+                <input type="range" id="slider" min="0" max="100" value="0">
+                <span id="duration"></span>
             </section>
             <section class="icons">
-                <i class="fa-solid fa-backward" id="previous"></i>
+                <i class="fa-solid fa-backward" id="prevBtn"></i>
                 <i class="fa-solid fa-pause" id="pause"></i>
                 <i class="fa-solid fa-play" id="play"></i>
-                <i class="fa-solid fa-forward" id="next"></i>
+                <i class="fa-solid fa-forward" id="nextBtn"></i>
             </section>
         </section>
     </main>
 
-    <script>
-        let Song = new Audio("./AGONY-Blinding_Lights.mp3");
-        Song.volume = .2;
-
-        let playstate = false;
-        const play_btn = document.getElementById("play");
-        const pause_btn = document.getElementById("pause");
-
-        function MusicPlayer() { //Fix Kbrd Shortcuts
-            if (playstate) {
-                Song.play();
-                play_btn.style.display = "none";
-                pause_btn.style.display = "block";
-            }
-            else {
-                Song.pause();
-                play_btn.style.display = "block";
-                pause_btn.style.display = "none";
-            }
-            playstate = !playstate
-        }
-
-        const cur_time = document.getElementById("cur_time");
-        const duration = document.getElementById("duration");
-        const slider = document.getElementById("slider");
-
-        function updateMusic() {
-            duration.textContent = Math.round(Song.duration); //prevod na minuty
-            slider.value = Math.round(Song.currentTime);
-            cur_time.textContent = slider.value;
-            updateGradient();
-        }
-
-        function updateGradient() {
-            slider.max = Math.round(Song.duration);
-            const val = (slider.value - slider.min) / (slider.max - slider.min) * 100;
-            console.log(val, slider.max, slider.min, slider.value);
-            slider.style.background = `linear-gradient(to right, #C04065 0%, #ddd ${val}%)`;
-        }
-
-        slider.addEventListener("input", updateGradient);
-        play_btn.addEventListener("click", MusicPlayer);
-        pause_btn.addEventListener("click", MusicPlayer);
-
-        MusicPlayer();
-        updateMusic();
-        updateGradient();
-        setInterval(updateMusic, 1000);
-
-        const cross = document.getElementById("X");
-
-        function triggerAnimation() {
-            cross.animate([
-                { transform: "scale(1) rotate(0deg)" },
-                { transform: "scale(1.1) rotate(-10deg)" },
-                { transform: "scale(1.1) rotate(10deg)" },
-                { transform: "scale(1.1) rotate(-10deg)" },
-                { transform: "scale(1.1) rotate(10deg)" },
-                { transform: "scale(1) rotate(0deg)" }
-            ], {
-                duration: 500,
-                easing: "ease-in-out"
-            });
-        }
-
-        cross.addEventListener("click", triggerAnimation);
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
 
