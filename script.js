@@ -3,19 +3,19 @@ const songs = [
     {
         title: "Blinding Lights",
         artists: "AGONY, kyoto, overrated",//Artists - span js
-        file: "./AGONY - Blinding Lights.mp3",
+        file: "./songs/AGONY - Blinding Lights.mp3",
         cover: "./covers/BlindingLights.jpg"
     },
     {
         title: "Я НЕ ХОЧУ!",
         artists: "Flerian, Lieless & AGONY ",
-        file: "./Я НЕ ХОЧУ!.mp3",
+        file: "./songs/Я НЕ ХОЧУ!.mp3",
         cover: "./covers/Я НЕ ХОЧУ!.jpg"
     },
     {
         title: "I REALLY WANT TO STAY AT YOUR HOUSE",
         artists: "Rosa Walton, Hallie Coggins",
-        file: "./I REALLY WANT TO STAY AT YOUR HOUSE.mp3",
+        file: "./songs/I REALLY WANT TO STAY AT YOUR HOUSE.mp3",
         cover: "./covers/I REALLY WANT TO STAY AT YOUR HOUSE.jpg"
     }
 ];
