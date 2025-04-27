@@ -167,6 +167,6 @@ cross.addEventListener("click", triggerAnimation);
 loadSong(currentSong, false);
 updateMusic();
 updateGradient();
-setInterval(updateMusic, 500); // Update every second
+setInterval(updateMusic, 500);
 
 //Todo: volume slider, automatic accent color
