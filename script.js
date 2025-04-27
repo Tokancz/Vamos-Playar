@@ -169,4 +169,4 @@ updateMusic();
 updateGradient();
 setInterval(updateMusic, 500); // Update every second
 
-//Todo: volume slider
+//Todo: volume slider, automatic accent color
