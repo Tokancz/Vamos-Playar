@@ -132,7 +132,7 @@ function updateGradient() {
 }
 function updateVolumeColor() {
     const val = (Vslider.value - Vslider.min) / (Vslider.max - Vslider.min) * 100; // Calculate progress in percentage
-    Vslider.style.background = `linear-gradient(to top, #C04065 ${val}%, #ddd ${val}%)`; // Set color from start to thumb position
+    Vslider.style.background = `linear-gradient(to bottom, #ddd ${val}%, #C04065 ${val}%)`; // Set color from start to thumb position
 }
 
 // ⏩ SEEK TO NEW POSITION

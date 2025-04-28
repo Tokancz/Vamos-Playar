@@ -101,16 +101,19 @@ input[type="range"]::-webkit-slider-thumb {
 }
 input[type="range"].volume-range {
     -webkit-appearance: none;
+    writing-mode: vertical-lr;
     width: 8px;
     height: 100px;
 }
 input[type="range"].volume-range::-webkit-slider-runnable-track {
     width: 8px;
+    height: 100px;
     border-radius: 5px;
-    background: #C04065; /* Transparent track */
+    background: transparent;
 }
 input[type="range"].volume-range::-webkit-slider-thumb {
     margin-left: -6px;
+    margin-top: 0px;
 }
 section.icons {
     width:70%;
