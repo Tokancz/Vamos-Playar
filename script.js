@@ -23,6 +23,12 @@ const songs = [
         artists: "Rosa Walton, Hallie Coggins",
         file: "./songs/Eenie Meenie - A Minecraft Parody.mp3",
         cover: "./covers/Eenie Meenie - A Minecraft Parody.png"
+    },
+    {
+        title: "This Is The Life - LIZOT & KYANU",
+        artists: "LIZOT & KYANU",
+        file: "./songs/This Is The Life - LIZOT & KYANU.mp3",
+        cover: "./covers/This Is The Life - LIZOT & KYANU.jpg"
     }
 ];
 
@@ -50,6 +56,7 @@ const Vslider = document.getElementById("volume-range");
 const songTitle = document.getElementById("songTitle");
 const artists = document.getElementById("artists");
 const coverImage = document.getElementById("coverImage");
+const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
 const BG = document.body;
 const cross = document.getElementById("X");
 
@@ -84,14 +91,9 @@ function loadSong(index, autoplay = false) {
 
     // Update body background
     BG.style.backgroundImage = `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10,10,10,0.4) 100%), url('${track.cover}')`;
-    BG.style.backgroundSize = "cover";
-    BG.style.backgroundPosition = "center";
-    BG.style.backgroundRepeat = "no-repeat";
-    BG.style.backgroundAttachment = "fixed";
-    BG.style.backdropFilter = "blur(30px)";
 
     // Update cover image
-    coverImage.src = track.cover;
+    coverImage.src = track.cover;  
 
     if (autoplay || playstate) {
         Song.play();
@@ -140,7 +142,6 @@ function toggleMute() {
     updateVolumeColor();
 }
 
-
 async function togglePlayPause() {
     if (Song.paused) {
         try {
@@ -177,13 +178,23 @@ function updateMusic() {
 
 // 🌈 UPDATE SLIDER GRADIENTS
 function updateGradient() {
+    // Fetch the updated value of --accent after it has been set in the :root
+    const accent = getComputedStyle(document.documentElement)
+      .getPropertyValue('--accent')
+      .trim();
     const val = (slider.value - slider.min) / (slider.max - slider.min) * 100;
-    slider.style.background = `linear-gradient(to right, #C04065 0%, #ddd ${val}%)`;
+    slider.style.background = `linear-gradient(to right, ${accent} 0%, #ddd ${val}%)`;
 }
+
 function updateVolumeColor() {
-    const val = (Vslider.value - Vslider.min) / (Vslider.max - Vslider.min) * 100; // Calculate progress in percentage
-    Vslider.style.background = `linear-gradient(to bottom, #ddd ${val}%, #C04065 ${val}%)`; // Set color from start to thumb position
+    // Fetch the updated value of --accent after it has been set in the :root
+    const accent = getComputedStyle(document.documentElement)
+      .getPropertyValue('--accent')
+      .trim();
+    const val = (Vslider.value - Vslider.min) / (Vslider.max - Vslider.min) * 100;
+    Vslider.style.background = `linear-gradient(to bottom, #ddd ${val}%, ${accent} ${val}%)`;
 }
+
 
 // ⏩ SEEK TO NEW POSITION
 function seekSong() {
@@ -203,6 +214,52 @@ function triggerAnimation() {
         duration: 500,
         easing: "ease-in-out"
     });
+}
+
+const colorThief = new ColorThief();
+const img = document.getElementById('coverImage');
+
+img.addEventListener('load', () => {
+    if (img.complete && img.naturalHeight !== 0) {
+      const palette = colorThief.getPalette(img, 10); // get 10 colors
+  
+      // Find the best vibrant color, not white/black/gray
+      const accent = pickVibrantColor(palette);
+  
+      const hexAccent = rgbToHex(...accent);
+      console.log('Chosen Accent Color:', hexAccent);
+  
+      // Update the --accent CSS variable
+      document.documentElement.style.setProperty('--accent', hexAccent);
+  
+      // Now update your UI elements with the new accent
+      updateGradient(); // Update slider gradient
+      updateVolumeColor(); // Update volume slider color
+    }
+});
+
+// Converts [r, g, b] into a hex string
+function rgbToHex(r, g, b) {
+  return "#" + [r, g, b].map(x => x.toString(16).padStart(2, "0")).join('');
+}
+
+// Picks the most vibrant color (not white/black/grayish)
+function pickVibrantColor(palette) {
+  for (const color of palette) {
+    const [r, g, b] = color;
+    const brightness = (r + g + b) / 3;
+
+    // Ignore very bright (white-ish) and very dark (black-ish) colors
+    if (brightness > 40 && brightness < 220) {
+      // Also ignore very grayish colors (where r ≈ g ≈ b)
+      const maxDiff = Math.max(Math.abs(r - g), Math.abs(r - b), Math.abs(g - b));
+      if (maxDiff > 20) {
+        return color; // found a colorful one
+      }
+    }
+  }
+  // fallback: just pick the first one if nothing better
+  return palette[0];
 }
 
 // 🎧 WHEN SONG ENDS, AUTOPLAY NEXT
@@ -242,4 +299,5 @@ setVolume();
 updateVolumeColor();
 setInterval(updateMusic, 500);
 
-//Todo: volume slider, automatic accent color
+
+//Todo: Fix media Keys

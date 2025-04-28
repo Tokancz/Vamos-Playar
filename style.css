@@ -15,6 +15,11 @@
 }
 body {
     width: 100%;
+    backdrop-filter: blur(30px);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
     transition: background-image 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out;
     background-color: black;
 }
@@ -68,7 +73,7 @@ section.detail {
     gap: 10px;
 }
 section.slider {
-    width: 90%;
+    width: 80%;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -116,7 +121,7 @@ input[type="range"].volume-range::-webkit-slider-thumb {
     margin-top: 0px;
 }
 section.icons {
-    width:70%;
+    width: 250px;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
