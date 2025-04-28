@@ -16,7 +16,7 @@
 body {
     width: 100%;
     transition: background-image 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out;
-    color: var(--backdrop);
+    background-color: black;
 }
 main {
     width: 100%;
@@ -52,16 +52,20 @@ img.album_cover {
 
     border-radius: 10px;
 }
+section.UI {
+    display: flex;
+    align-items: center;
+    background-color: var(--backdrop);
+    padding: 20px;
+    gap: 15px;
+    border-radius: 20px;
+}
 section.detail {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 10px;
-
-    background-color: var(--backdrop);
-    padding: 20px;
-    border-radius: 20px;
 }
 section.slider {
     width: 90%;
@@ -95,6 +99,19 @@ input[type="range"]::-webkit-slider-thumb {
     cursor: pointer;
     margin-top: -6px;
 }
+input[type="range"].volume-range {
+    -webkit-appearance: none;
+    width: 8px;
+    height: 100px;
+}
+input[type="range"].volume-range::-webkit-slider-runnable-track {
+    width: 8px;
+    border-radius: 5px;
+    background: #C04065; /* Transparent track */
+}
+input[type="range"].volume-range::-webkit-slider-thumb {
+    margin-left: -6px;
+}
 section.icons {
     width:70%;
     display: flex;
@@ -107,6 +124,13 @@ section.icons i {
 }
 i#pause, i#play {
     font-size: 2.5em;
+}
+section.volume {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 10px;
 }
 
 @media (width <= 1024px) {
@@ -121,5 +145,5 @@ i#pause, i#play {
 @media (width <= 320px) {
     body { background-size: 250%;}
     img.album_cover { width: 300px; height: 300px; }
-    section.detail { padding: 10px;}
+    section.UI { padding: 10px;}
 }

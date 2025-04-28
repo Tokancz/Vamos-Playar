@@ -24,7 +24,8 @@ const songs = [
 let currentSong = 0;
 let playstate = false;
 let Song = new Audio();
-Song.volume = .05;
+let volume = .05;
+Song.volume = volume;
 
 const play_btn = document.getElementById("play");
 const pause_btn = document.getElementById("pause");
@@ -34,11 +35,19 @@ const prev_btn = document.getElementById("prevBtn");
 const cur_time = document.getElementById("cur_time");
 const duration = document.getElementById("duration");
 const slider = document.getElementById("slider");
+const Vslider = document.getElementById("volume-range");
 const songTitle = document.getElementById("songTitle");
 const artists = document.getElementById("artists");
 const coverImage = document.getElementById("coverImage");
 const BG = document.body;
 const cross = document.getElementById("X");
+
+function setVolume() {
+    const invertedValue = 100 - Vslider.value; // Flip it!
+    volume = Math.round(invertedValue) / 100;
+    Song.volume = volume;
+    updateVolumeColor();
+}
 
 // 🎶 LOAD A SONG FROM QUEUE
 function loadSong(index, autoplay = false) {
@@ -116,10 +125,14 @@ function updateMusic() {
     }
 }
 
-// 🌈 UPDATE SLIDER GRADIENT
+// 🌈 UPDATE SLIDER GRADIENTS
 function updateGradient() {
     const val = (slider.value - slider.min) / (slider.max - slider.min) * 100;
     slider.style.background = `linear-gradient(to right, #C04065 0%, #ddd ${val}%)`;
+}
+function updateVolumeColor() {
+    const val = (Vslider.value - Vslider.min) / (Vslider.max - Vslider.min) * 100; // Calculate progress in percentage
+    Vslider.style.background = `linear-gradient(to top, #C04065 ${val}%, #ddd ${val}%)`; // Set color from start to thumb position
 }
 
 // ⏩ SEEK TO NEW POSITION
@@ -160,6 +173,11 @@ prev_btn.addEventListener("click", prevSong);
 
 slider.addEventListener("input", updateGradient);
 slider.addEventListener("change", seekSong);
+
+Vslider.addEventListener("input", () => {
+    setVolume();
+    updateVolumeColor(); // Update color dynamically as user moves the thumb
+});
 
 cross.addEventListener("click", triggerAnimation);
 
