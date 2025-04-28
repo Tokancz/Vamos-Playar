@@ -73,7 +73,7 @@ section.detail {
     gap: 10px;
 }
 section.slider {
-    width: 80%;
+    width: 85%;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
