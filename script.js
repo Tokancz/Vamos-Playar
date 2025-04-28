@@ -17,6 +17,12 @@ const songs = [
         artists: "Rosa Walton, Hallie Coggins",
         file: "./songs/I REALLY WANT TO STAY AT YOUR HOUSE.mp3",
         cover: "./covers/I REALLY WANT TO STAY AT YOUR HOUSE.jpg"
+    },
+    {
+        title: "Eenie Meenie - A Minecraft Parody",
+        artists: "Rosa Walton, Hallie Coggins",
+        file: "./songs/Eenie Meenie - A Minecraft Parody.mp3",
+        cover: "./covers/Eenie Meenie - A Minecraft Parody.png"
     }
 ];
 
@@ -25,12 +31,17 @@ let currentSong = 0;
 let playstate = false;
 let Song = new Audio();
 let volume = .05;
+let invertedValue = 100;
+let muted = false;
 Song.volume = volume;
 
 const play_btn = document.getElementById("play");
 const pause_btn = document.getElementById("pause");
 const next_btn = document.getElementById("nextBtn");
 const prev_btn = document.getElementById("prevBtn");
+
+const unmute_btn = document.getElementById("unmuted");
+const mute_btn = document.getElementById("muted");
 
 const cur_time = document.getElementById("cur_time");
 const duration = document.getElementById("duration");
@@ -43,8 +54,22 @@ const BG = document.body;
 const cross = document.getElementById("X");
 
 function setVolume() {
-    const invertedValue = 100 - Vslider.value; // Flip it!
-    volume = Math.round(invertedValue) / 100;
+
+    if (invertedValue != 100 - Vslider.value) {
+        invertedValue = 100 - Vslider.value;
+        volume = Math.round(invertedValue) / 100;
+        muted = false;
+    }
+
+    if (volume == 0) {
+        mute_btn.style.display = "block";
+        unmute_btn.style.display = "none";
+    }
+    else {
+        mute_btn.style.display = "none";
+        unmute_btn.style.display = "block";
+    }
+
     Song.volume = volume;
     updateVolumeColor();
 }
@@ -90,6 +115,31 @@ function prevSong() {
     currentSong = (currentSong - 1 + songs.length) % songs.length;
     loadSong(currentSong, true); // always autoplay after skipping
 }
+
+function toggleMute() {
+    if (!muted) { 
+        localStorage.setItem("last_volume", volume);
+        volume = 0;
+    } else { 
+        volume = parseFloat(localStorage.getItem("last_volume")) || 0.05; // Default if null
+    }
+    muted = !muted;
+    // Update the real song volume
+    Song.volume = volume;
+    // Update slider position to match volume
+    invertedValue = (1 - volume) * 100; // Because your slider is inverted
+    Vslider.value = invertedValue; // Update slider
+    // Update mute/unmute icons
+    if (volume == 0) {
+        mute_btn.style.display = "block";
+        unmute_btn.style.display = "none";
+    } else {
+        mute_btn.style.display = "none";
+        unmute_btn.style.display = "block";
+    }
+    updateVolumeColor();
+}
+
 
 async function togglePlayPause() {
     if (Song.paused) {
@@ -171,6 +221,9 @@ pause_btn.addEventListener('click', togglePlayPause);
 next_btn.addEventListener("click", nextSong);
 prev_btn.addEventListener("click", prevSong);
 
+mute_btn.addEventListener("click", toggleMute);
+unmute_btn.addEventListener("click", toggleMute);
+
 slider.addEventListener("input", updateGradient);
 slider.addEventListener("change", seekSong);
 
@@ -185,6 +238,8 @@ cross.addEventListener("click", triggerAnimation);
 loadSong(currentSong, false);
 updateMusic();
 updateGradient();
+setVolume();
+updateVolumeColor();
 setInterval(updateMusic, 500);
 
 //Todo: volume slider, automatic accent color
