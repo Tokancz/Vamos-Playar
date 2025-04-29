@@ -43,11 +43,11 @@ img.logo {
     height: 90%;
 }
 section.searchbar {
-    width: 300px;
+    width: 400px;
     height: 50%;
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content:space-between;
     border-radius: 10px;
     background-color: var(--backdrop);
 }
@@ -56,13 +56,14 @@ i#user {
 }
 section.songtab {
     width: 90%;
-    height: 100px;
+    height: 80px;
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
-    gap: 20px;
+    justify-content: start;
+    gap: 40px;
 
-    margin: 10px;
+    margin: 20px;
+    padding: 10px 10px;
     border-radius: 10px;
     background-color: var(--backdrop);
 }
@@ -74,8 +75,12 @@ section.songtab {
 section.songtabdetails {
     width: 80%;
 }
-.songtabdetails h3 {
+.songtabdetails h3, .songtabdetails p {
     text-align: left;
+}
+p.songDuration {
+    width: 5%;
+    text-align: end;
 }
 section.maximalized {
     position: absolute;
