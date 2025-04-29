@@ -61,6 +61,11 @@ i#user {
 i#user:hover {
     filter: brightness(1.1);
 }
+section.songList {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
 section.songtab {
     width: 95%;
     height: 80px;
@@ -123,7 +128,7 @@ i:hover {
 }
 i#X {
     display: none;
-    position: absolute;
+    position: fixed;
     top: 30px;
     left: 50px;
     font-size: 2em;
@@ -174,7 +179,7 @@ section.SongCover {
 }
 section.yap {
     height: 100%;
-    width: 900%;
+    width: 90%;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -188,7 +193,6 @@ p#artists {
     text-align: right;
 }
 img.album_cover {
-    height: 100%;
     border-radius: 10px;
 }
 input[type="range"] {
@@ -228,6 +232,9 @@ input[type="range"].volume-range::-webkit-slider-runnable-track {
 input[type="range"].volume-range::-webkit-slider-thumb {
     margin-left: -6px;
     margin-top: 0px;
+}
+.hidden {
+    display: none;
 }
 
 @media (width <= 1024px) {

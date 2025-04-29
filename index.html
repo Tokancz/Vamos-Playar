@@ -10,7 +10,7 @@
     <title>Vamos Playar</title>
 </head>
 <body>
-    <nav>
+    <nav id="nav">
         <img src="Images/VPLogoWithText.png" alt="Logo" class="logo">
         <section class="searchbar">
             <p>Search song</p>
@@ -19,7 +19,8 @@
         <i class="fa-solid fa-user" id="user"></i>
     </nav>
     <main>
-        <section class="songtab">
+        <section class="songList" id="songList">
+            <section class="songtab">
             <section class="songInfo">
                 <img src="covers/BlindingLights.jpg" alt="cover" class="songCover">
                 <section class="songTabDetails">
@@ -28,9 +29,9 @@
                 </section>
             </section>
             <p class="songDuration">0:00</p>
-            
         </section>
-        <section class="minimalized">
+        </section>
+        <section class="minimalized" id="tab">
             <i class="fa-solid fa-xmark" id="X"></i>
             <section class="volume">
                 <input class="volume-range" id="volume-range" type="range" value="20" min="0" max="100">
@@ -50,7 +51,7 @@
                     <i class="fa-solid fa-forward" id="nextBtn"></i>
                 </section>
             </section>
-            <section class="SongCover">
+            <section class="SongCover" id="songCover">
                 <section class="yap">
                     <h1 id="songTitle"></h1>
                     <p id="artists"></p>

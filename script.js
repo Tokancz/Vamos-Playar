@@ -60,6 +60,34 @@ const accent = getComputedStyle(document.documentElement).getPropertyValue('--ac
 const BG = document.body;
 const cross = document.getElementById("X");
 
+
+function toggleTab(){
+    tab = document.getElementById("tab")
+    nav = document.getElementById("nav")
+    sList = document.getElementById("songList")
+    song = document.getElementById("songCover")
+
+    BG.style.backdropFilter = "brightness(1) blur(30px)";
+    nav.style.display = "none";
+    sList.style.display = "none";
+    cross.style.display = "block"
+    song.style.position = "fixed";
+    song.style.left = "35%";
+    song.style.top = "20%";
+    song.style.width = "30%";
+    song.style.height = "400px";
+    song.style.flexDirection = "column-reverse";
+    song.style.alignItems = "center";
+    coverImage.style.width = "100%";
+    artists.style.textAlign = "center";
+    songTitle.style.textAlign = "center";
+    tab.style.width = "40%";
+    tab.style.flexDirection = "row-reverse";
+    tab.style.justifyContent = "flex-start";
+    tab.style.gap = "40px";
+    slider.style.width = "400px"
+}
+
 function setVolume() {
 
     if (invertedValue != 100 - Vslider.value) {
@@ -290,6 +318,8 @@ Vslider.addEventListener("input", () => {
 });
 
 cross.addEventListener("click", triggerAnimation);
+
+coverImage.addEventListener("click", toggleTab);
 
 // No auto play on page load
 loadSong(currentSong, false);
