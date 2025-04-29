@@ -4,37 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://api.ssps.cajthaml.eu/file/64d9f18f79dad891e8a07c73">
+    <link rel="stylesheet" href="reset.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="icon" type="image/png" href="Images/favicon.ico">    
     <title>Vamos Playar</title>
 </head>
 <body>
     <main>
-        <img alt="Album cover" class="album_cover" id="coverImage" draggable="false">
-        <i class="fa-solid fa-xmark" id="X"></i>
-        <h1 id="songTitle"></h1>
-        <section class="UI">
-            <section class="detail">
-                <p id="artists"></p>
-                <section class="slider">
-                    <span id="cur_time"></span>
-                    <input type="range" id="slider" min="0" max="100" value="50">
-                    <span id="duration"></span>
-                </section>
-                <section class="icons">
-                    <i class="fa-solid fa-backward" id="prevBtn"></i>
-                    <i class="fa-solid fa-pause" id="pause"></i>
-                    <i class="fa-solid fa-play" id="play"></i>
-                    <i class="fa-solid fa-forward" id="nextBtn"></i>
-                </section>
+        <nav>
+            <img src="Images/VPLogoWithText.png" alt="Logo" class="logo">
+            <section class="searchbar">
+                <p>Search song</p>
+                <i class="fa-solid fa-magnifying-glass"></i>
             </section>
-            <section class="volume">
-                <input class="volume-range" id="volume-range" type="range" value="20" min="0" max="100">
-                <i class="fa-solid fa-volume-high" id="unmuted"></i>
-                <i class="fa-solid fa-volume-xmark" id="muted"></i>
+            <i class="fa-solid fa-user" id="user"></i>
+        </nav>
+        <section class="songtab">
+            <img src="covers/BlindingLights.jpg" alt="cover" class="songCover">
+            <section class="songtabdetails">
+                <h3 class="songName">Song name</h3>
+                <p class="songArtists">Song artists</p>
+            </section>
+            <p class="songDuration">0:00</p>
+            
+        </section>
+        <!--
+        <section class="maximalized">
+            <img alt="Album cover" class="album_cover" id="coverImage" draggable="false">
+            <i class="fa-solid fa-xmark" id="X"></i>
+            <h1 id="songTitle"></h1>
+            <section class="UI">
+                <section class="detail">
+                    <p id="artists"></p>
+                    <section class="slider">
+                        <span id="cur_time"></span>
+                        <input type="range" id="slider" min="0" max="100" value="50">
+                        <span id="duration"></span>
+                    </section>
+                    <section class="icons">
+                        <i class="fa-solid fa-backward" id="prevBtn"></i>
+                        <i class="fa-solid fa-pause" id="pause"></i>
+                        <i class="fa-solid fa-play" id="play"></i>
+                        <i class="fa-solid fa-forward" id="nextBtn"></i>
+                    </section>
+                </section>
+                <section class="volume">
+                    <input class="volume-range" id="volume-range" type="range" value="20" min="0" max="100">
+                    <i class="fa-solid fa-volume-high" id="unmuted"></i>
+                    <i class="fa-solid fa-volume-xmark" id="muted"></i>
+                </section>
             </section>
         </section>
+        -->
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
     <script src="script.js"></script>
