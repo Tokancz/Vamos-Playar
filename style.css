@@ -51,6 +51,7 @@ section.searchbar {
     border-radius: 10px;
     padding: 0 20px;
     background-color: var(--backdrop);
+    backdrop-filter: brightness(.5);
 }
 i#user {
     font-size: 2em;
@@ -101,16 +102,24 @@ p.songDuration {
 section.minimalized {
     position:fixed;
     bottom: 100px;
-    width: 97%;
-    height: 20%;
+    width: 95%;
+    height: 15%;
 
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 10px 20px 10px; 
     align-items: center;
     gap: 30px;
 
     background-color: var(--backdrop);
     border-radius: 20px;
+}
+p{
+    color: var(--primary);
+}
+i:hover {
+    color: #FFFFFF;
+    transform: scale(1.1);
 }
 i#X {
     display: none;
@@ -120,47 +129,21 @@ i#X {
     font-size: 2em;
     transition: .3s;
 }
-h1 {
-    position: absolute;
-    right: 15%;
-    top: 30%;
-    font-size: 2.2em;
-    font-weight: 600;
-}
-p, span{
-    color: var(--primary);
-}
-i:hover {
-    color: #FFFFFF;
-    transform: scale(1.1);
-}
-img.album_cover {
-    position: absolute;
-    right: 20px;
-    height: 90%;
-    border-radius: 10px;
-}
-section.UI {
+section.volume {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 20px;
-    gap: 15px;
-    border-radius: 20px;
+    justify-content: space-evenly;
+    gap: 10px;
 }
 section.detail {
-    position: absolute;
-    left: 10%;
+    position: relative;
+    top: 10%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 10px;
-}
-p#artists {
-    position: absolute;
-    right: 15%;
-    bottom: 30%;
-
 }
 section.slider {
     width: 85%;
@@ -169,8 +152,44 @@ section.slider {
     align-items: center;
     gap: 10px;
 }
-section.slider p {
-    font-size: .75em;
+section.icons {
+    width: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+section.icons i {
+    font-size: 1.8em;
+    transition: .3s;
+}
+i#pause, i#play {
+    font-size: 2.5em;
+}
+section.SongCover {
+    height: 90%;
+    width: 60%;
+    display: flex;
+    justify-content: end;
+    gap: 20px;
+}
+section.yap {
+    height: 100%;
+    width: 900%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+h1 {
+    font-size: 2em;
+    font-weight: 600;
+    text-align: right;
+}
+p#artists {
+    text-align: right;
+}
+img.album_cover {
+    height: 100%;
+    border-radius: 10px;
 }
 input[type="range"] {
     -webkit-appearance: none;
@@ -210,28 +229,6 @@ input[type="range"].volume-range::-webkit-slider-thumb {
     margin-left: -6px;
     margin-top: 0px;
 }
-section.icons {
-    width: 250px;
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-}
-section.icons i {
-    font-size: 1.8em;
-    transition: .3s;
-}
-i#pause, i#play {
-    font-size: 2.5em;
-}
-section.volume {
-    position: absolute;
-    left: 4%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-    gap: 10px;
-}
 
 @media (width <= 1024px) {
     img.album_cover {width: 400px; height: 400px;}
@@ -250,3 +247,5 @@ section.volume {
     img.album_cover { width: 300px; height: 300px; }
     input[type="range"] { width: 150px; }
 }
+
+/*responzivita*/
