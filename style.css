@@ -51,7 +51,8 @@ section.searchbar {
     border-radius: 10px;
     padding: 0 20px;
     background-color: var(--backdrop);
-    backdrop-filter: brightness(.5);
+    backdrop-filter: brightness(.1);
+    border: var(--accent) 2px solid;
 }
 i#user {
     font-size: 2em;
