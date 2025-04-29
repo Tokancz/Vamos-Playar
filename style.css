@@ -15,7 +15,7 @@
 }
 body {
     width: 100%;
-    backdrop-filter: blur(30px) brightness(.2);
+    backdrop-filter: blur(30px) brightness(.3);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -144,7 +144,7 @@ section.volume {
 section.detail {
     position: relative;
     top: 10%;
-    width: 80%;
+    width: 40%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -152,7 +152,7 @@ section.detail {
     gap: 10px;
 }
 section.slider {
-    width: 85%;
+    width: 100%;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -195,6 +195,7 @@ p#artists {
 }
 img.album_cover {
     border-radius: 10px;
+    height: 100%;
 }
 input[type="range"] {
     -webkit-appearance: none;
@@ -234,8 +235,48 @@ input[type="range"].volume-range::-webkit-slider-thumb {
     margin-left: -6px;
     margin-top: 0px;
 }
-.hidden {
-    display: none;
+/* Smooth transition for layout change */
+#tab,
+#songCover {
+    transition: all 0.4s ease-in-out;
+}
+
+/* Default collapsed (minimalized) state */
+#tab.collapsed {
+    width: 95%;
+    height: 15%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+}
+#songCover.collapsed {
+    position: static;
+    width: 60%;
+    height: 100%;
+    flex-direction: row;
+    align-items: end;
+    justify-content: end;
+    transform: none;
+}
+/* Expanded (tab open) state */
+#tab.expanded {
+    width: 35%;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+#songCover.expanded {
+    position: fixed;
+    left: 50%;
+    top: 35%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 500px;
+    height: auto;
+    flex-direction: column-reverse;
+    align-items: center;
 }
 
 @media (width <= 1024px) {

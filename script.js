@@ -67,6 +67,7 @@ function toggleTab() {
     const nav = document.getElementById("nav");
     const sList = document.getElementById("songList");
     const song = document.getElementById("songCover");
+    const detail = document.getElementById("detail");
     const yap = document.getElementById("yap");
 
     if (!tabOpen) {
@@ -75,38 +76,41 @@ function toggleTab() {
         nav.style.display = "none";
         sList.style.display = "none";
         cross.style.display = "block";
-        song.style.position = "fixed";
-        song.style.left = "50%";
-        song.style.top = "35%";
-        song.style.transform = "translate(-50%, -50%)";
-        song.style.width = "90%";
-        song.style.maxWidth = "500px";
-        song.style.height = "auto";
-        song.style.flexDirection = "column-reverse";
-        song.style.alignItems = "center";
+
+        tab.classList.remove("collapsed");
+        song.classList.remove("collapsed");
+        tab.classList.add("expanded");
+        song.classList.add("expanded");
+
         coverImage.style.width = "100%";
         artists.style.textAlign = "center";
         songTitle.style.textAlign = "center";
-        tab.style.width = "35%";
-        tab.style.flexDirection = "row-reverse";
-        tab.style.justifyContent = "center";
-        tab.style.alignItems = "center";
-        tab.style.gap = "20px";
+        detail.style.width = "80%";
         slider.style.width = "100%";
         yap.style.gap = "20px";
+
         tabOpen = true;
+        localStorage.setItem("tabState", "open");
     } else {
         // CLOSE TAB
-        BG.style.backdropFilter = "blur(30px) brightness(.2)";
+        BG.style.backdropFilter = "blur(30px) brightness(.3)";
         nav.style.display = "flex";
         sList.style.display = "flex";
         cross.style.display = "none";
-        song.style = "";
+
+        tab.classList.remove("expanded");
+        song.classList.remove("expanded");
+        tab.classList.add("collapsed");
+        song.classList.add("collapsed");
+
         coverImage.style = "";
         artists.style.textAlign = "";
         songTitle.style.textAlign = "";
-        tab.style = "";
+        detail.style = "";
+        yap.style.gap = "";
+
         tabOpen = false;
+        localStorage.setItem("tabState", "closed");
     }
 }
 
@@ -339,14 +343,24 @@ Vslider.addEventListener("input", () => {
     updateVolumeColor(); // Update color dynamically as user moves the thumb
 });
 
-cross.addEventListener("click", triggerAnimation);
 cross.addEventListener("click", () => {
     triggerAnimation();
-    toggleTab();
+    setTimeout(() => {
+        toggleTab();
+    }, 500); // match animation duration
 });
 
-
 coverImage.addEventListener("click", toggleTab);
+
+window.addEventListener("load", () => {
+    const savedTabState = localStorage.getItem("tabState");
+    if (savedTabState === "open") {
+        // Wait a tick to make sure DOM is ready
+        setTimeout(() => {
+            toggleTab(); // Open it on load
+        }, 50);
+    }
+});
 
 // No auto play on page load
 loadSong(currentSong, false);
