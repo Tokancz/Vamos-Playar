@@ -69,6 +69,10 @@ function toggleTab() {
     const song = document.getElementById("songCover");
     const detail = document.getElementById("detail");
     const yap = document.getElementById("yap");
+    const volume = document.querySelector("section.volume");
+    const sliderSection = document.querySelector("section.slider");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
 
     if (!tabOpen) {
         // OPEN TAB
@@ -79,8 +83,19 @@ function toggleTab() {
 
         tab.classList.remove("collapsed");
         song.classList.remove("collapsed");
+        volume.classList.remove("collapsed");
+        sliderSection.classList.remove("collapsed");
+        prevBtn.classList.remove("collapsed");
+        nextBtn.classList.remove("collapsed");
+        artists.classList.remove("collapsed");
+
         tab.classList.add("expanded");
         song.classList.add("expanded");
+        volume.classList.add("expanded");
+        sliderSection.classList.add("expanded");
+        prevBtn.classList.add("expanded");
+        nextBtn.classList.add("expanded");
+        artists.classList.add("expanded");
 
         coverImage.style.width = "100%";
         artists.style.textAlign = "center";
@@ -100,8 +115,19 @@ function toggleTab() {
 
         tab.classList.remove("expanded");
         song.classList.remove("expanded");
+        volume.classList.remove("expanded");
+        sliderSection.classList.remove("expanded");
+        prevBtn.classList.remove("expanded");
+        nextBtn.classList.remove("expanded");
+        artists.classList.remove("expanded");
+
         tab.classList.add("collapsed");
         song.classList.add("collapsed");
+        volume.classList.add("collapsed");
+        sliderSection.classList.add("collapsed");
+        prevBtn.classList.add("collapsed");
+        nextBtn.classList.add("collapsed");
+        artists.classList.add("collapsed");
 
         coverImage.style = "";
         artists.style.textAlign = "";
