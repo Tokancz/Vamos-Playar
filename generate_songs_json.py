@@ -65,3 +65,5 @@ with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
     json.dump(songs, f, indent=2, ensure_ascii=False)
 
 print(f"Generated {OUTPUT_JSON} with {len(songs)} songs.")
+
+#script run: /Library/Frameworks/Python.framework/Versions/3.11/bin/python3 generate_songs_json.py
