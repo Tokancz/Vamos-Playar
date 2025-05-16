@@ -1,36 +1,19 @@
 // 🎵 SONGS QUEUE
-const songs = [
-    {
-        title: "Blinding Lights",
-        artists: "AGONY, kyoto, overrated",//Artists - span js
-        file: "./songs/AGONY - Blinding Lights.mp3",
-        cover: "./covers/BlindingLights.jpg"
-    },
-    {
-        title: "Я НЕ ХОЧУ!",
-        artists: "Flerian, Lieless & AGONY ",
-        file: "./songs/Я НЕ ХОЧУ!.mp3",
-        cover: "./covers/Я НЕ ХОЧУ!.jpg"
-    },
-    {
-        title: "I REALLY WANT TO STAY AT YOUR HOUSE",
-        artists: "Rosa Walton, Hallie Coggins",
-        file: "./songs/I REALLY WANT TO STAY AT YOUR HOUSE.mp3",
-        cover: "./covers/I REALLY WANT TO STAY AT YOUR HOUSE.jpg"
-    },
-    {
-        title: "Eenie Meenie - A Minecraft Parody",
-        artists: "Rosa Walton, Hallie Coggins",
-        file: "./songs/Eenie Meenie - A Minecraft Parody.mp3",
-        cover: "./covers/Eenie Meenie - A Minecraft Parody.png"
-    },
-    {
-        title: "This Is The Life - LIZOT & KYANU",
-        artists: "LIZOT & KYANU",
-        file: "./songs/This Is The Life - LIZOT & KYANU.mp3",
-        cover: "./covers/This Is The Life - LIZOT & KYANU.jpg"
+let songs = [];
+
+fetch('./songs.json')
+  .then(res => res.json())
+  .then(data => {
+    console.log("Loaded songs:", data);
+    songs = data;
+    if (songs.length > 0) {
+      loadSong(currentSong, false);
+      setup(); // Call your original setup logic
+    } else {
+      console.error("No songs found in songs.json");
     }
-];
+  })
+  .catch(err => console.error("Failed to load songs:", err));
 
 // 🔥 SETUP
 let currentSong = 0;
@@ -39,16 +22,15 @@ let Song = new Audio();
 let volume = .05;
 let invertedValue = 100;
 let muted = false;
+let tabOpen = false;
 Song.volume = volume;
 
 const play_btn = document.getElementById("play");
 const pause_btn = document.getElementById("pause");
 const next_btn = document.getElementById("nextBtn");
 const prev_btn = document.getElementById("prevBtn");
-
 const unmute_btn = document.getElementById("unmuted");
 const mute_btn = document.getElementById("muted");
-
 const cur_time = document.getElementById("cur_time");
 const duration = document.getElementById("duration");
 const slider = document.getElementById("slider");
@@ -60,7 +42,40 @@ const accent = getComputedStyle(document.documentElement).getPropertyValue('--ac
 const BG = document.body;
 const cross = document.getElementById("X");
 
-let tabOpen = false;
+function setup() {
+    updateMusic();
+    updateGradient();
+    setVolume();
+    updateVolumeColor();
+    setInterval(updateMusic, 500);
+
+    play_btn.addEventListener('click', togglePlayPause);
+    pause_btn.addEventListener('click', togglePlayPause);
+    next_btn.addEventListener("click", nextSong);
+    prev_btn.addEventListener("click", prevSong);
+    mute_btn.addEventListener("click", toggleMute);
+    unmute_btn.addEventListener("click", toggleMute);
+    slider.addEventListener("input", updateGradient);
+    slider.addEventListener("change", seekSong);
+    Vslider.addEventListener("input", () => {
+        setVolume();
+        updateVolumeColor();
+    });
+    cross.addEventListener("click", () => {
+        triggerAnimation();
+        setTimeout(() => toggleTab(), 500);
+    });
+    coverImage.addEventListener("click", toggleTab);
+
+    window.addEventListener("load", () => {
+        const savedTabState = localStorage.getItem("tabState");
+        if (savedTabState === "open") {
+            setTimeout(() => toggleTab(), 50);
+        }
+    });
+
+    Song.addEventListener("ended", nextSong);
+}
 
 function toggleTab() {
     const tab = document.getElementById("tab");
@@ -351,50 +366,4 @@ document.addEventListener('keydown', function(e) {
         togglePlayPause();
     }
 });
-
-// 📻 SETUP EVENT LISTENERS
-play_btn.addEventListener('click', togglePlayPause);
-pause_btn.addEventListener('click', togglePlayPause);
-next_btn.addEventListener("click", nextSong);
-prev_btn.addEventListener("click", prevSong);
-
-mute_btn.addEventListener("click", toggleMute);
-unmute_btn.addEventListener("click", toggleMute);
-
-slider.addEventListener("input", updateGradient);
-slider.addEventListener("change", seekSong);
-
-Vslider.addEventListener("input", () => {
-    setVolume();
-    updateVolumeColor(); // Update color dynamically as user moves the thumb
-});
-
-cross.addEventListener("click", () => {
-    triggerAnimation();
-    setTimeout(() => {
-        toggleTab();
-    }, 500); // match animation duration
-});
-
-coverImage.addEventListener("click", toggleTab);
-
-window.addEventListener("load", () => {
-    const savedTabState = localStorage.getItem("tabState");
-    if (savedTabState === "open") {
-        // Wait a tick to make sure DOM is ready
-        setTimeout(() => {
-            toggleTab(); // Open it on load
-        }, 50);
-    }
-});
-
-// No auto play on page load
-loadSong(currentSong, false);
-updateMusic();
-updateGradient();
-setVolume();
-updateVolumeColor();
-setInterval(updateMusic, 500);
-
-
 //Todo: Fix media Keys
