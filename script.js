@@ -7,10 +7,11 @@ fetch('./songs.json')
     console.log("Loaded songs:", data);
     songs = data;
     if (songs.length > 0) {
-      loadSong(currentSong, false);
-      setup(); // Call your original setup logic
+        populateSongList();
+        loadSong(currentSong, false);
+        setup(); // Call your original setup logic
     } else {
-      console.error("No songs found in songs.json");
+        console.error("No songs found in songs.json");
     }
   })
   .catch(err => console.error("Failed to load songs:", err));
@@ -153,6 +154,54 @@ function toggleTab() {
         tabOpen = false;
         localStorage.setItem("tabState", "closed");
     }
+}
+
+function populateSongList() {
+    const songList = document.getElementById("songList");
+    songList.innerHTML = ""; // clear existing
+
+    songs.forEach((song, index) => {
+        const songTab = document.createElement("section");
+        songTab.classList.add("songtab");
+        songTab.dataset.index = index;
+
+        songTab.innerHTML = `
+            <section class="songInfo">
+                <img src="${song.cover}" alt="cover" class="songCover">
+                <section class="songTabDetails">
+                    <h3 class="songName">${song.title}</h3>
+                    <p class="songArtists">${song.artists}</p>
+                </section>
+            </section>
+            <p class="songDuration">0:00</p>
+        `;
+
+        songTab.addEventListener("click", () => {
+            loadSong(index, true);
+        });
+
+        songList.appendChild(songTab);
+    });
+    setDurations();
+}
+
+function setDurations() {
+    const tabs = document.querySelectorAll(".songtab");
+
+    tabs.forEach((tab, index) => {
+        const audio = new Audio();
+        audio.src = songs[index].file;
+
+        audio.addEventListener("loadedmetadata", () => {
+            const dur = audio.duration;
+            const minutes = Math.floor(dur / 60);
+            const seconds = Math.floor(dur % 60).toString().padStart(2, "0");
+            const durationText = `${minutes}:${seconds}`;
+            
+            const durationEl = tab.querySelector(".songDuration");
+            if (durationEl) durationEl.textContent = durationText;
+        });
+    });
 }
 
 function setVolume() {

@@ -74,14 +74,14 @@ section.songtab {
     align-items: center;
     justify-content: space-between;
     gap: 40px;
-    margin: 20px;
-    padding: 10px 10px;
+    margin: 10px;
+    padding: 10px;
     border-radius: 10px;
     background-color: var(--backdrop);
 }
 section.songInfo {
     height: 100%;
-    width: 40%;
+    width: 90%;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -337,7 +337,7 @@ section.slider.expanded {
 @media (width <= 768px) {
     * { font-size: .8em; }
     #tab.expanded {width: 45%;}
-    section.songtab {margin: 20px 0; gap: 10px; padding: 5px;}
+    section.songtab { gap: 10px; padding: 5px;}
     #tab.collapsed {height: 10%; padding: 10px;}
 }
 @media (width <= 425px) {
@@ -349,6 +349,7 @@ section.slider.expanded {
     #tab.expanded {width: 65%; font-size: 1.3em;}
     #songCover.collapsed {width: 95%;}
     #tab.collapsed {width: 90%; gap: 10px;}
+    section.songtab {width: 90%; height: 100px;}
     section.songInfo {width: 85%;}
     p.songDuration {width: 15%;}
     section.volume {display: none;}
