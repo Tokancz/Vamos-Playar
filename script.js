@@ -114,11 +114,13 @@ function toggleTab() {
         artists.classList.add("expanded");
 
         coverImage.style.width = "100%";
+        coverImage.style.height = "100%";
         artists.style.textAlign = "center";
         songTitle.style.textAlign = "center";
         detail.style.width = "80%";
         slider.style.width = "100%";
         yap.style.gap = "20px";
+        document.body.style.height = "100vh";
 
         tabOpen = true;
         localStorage.setItem("tabState", "open");
@@ -150,6 +152,7 @@ function toggleTab() {
         songTitle.style.textAlign = "";
         detail.style = "";
         yap.style.gap = "";
+        document.body.style.height = "";
 
         tabOpen = false;
         localStorage.setItem("tabState", "closed");
