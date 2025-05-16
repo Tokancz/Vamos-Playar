@@ -416,3 +416,4 @@ document.addEventListener('keydown', function(e) {
     }
 });
 //Todo: Fix media Keys
+//search
