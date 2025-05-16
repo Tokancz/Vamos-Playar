@@ -1,5 +1,17 @@
 [
   {
+    "title": "YUM YUM",
+    "artists": "LXNGVX/Mc Gw",
+    "file": "./songs/YUM YUM - LXNGVX.mp3",
+    "cover": "./covers/YUM YUM.jpg"
+  },
+  {
+    "title": "Red",
+    "artists": "molly",
+    "file": "./songs/Red - molly.mp3",
+    "cover": "./covers/Red.jpg"
+  },
+  {
     "title": "Я НЕ ХОЧУ!",
     "artists": "Flerian/Lieless/AGONY",
     "file": "./songs/Я НЕ ХОЧУ! - Flerian.mp3",
@@ -12,15 +24,39 @@
     "cover": "./covers/Ева.jpg"
   },
   {
+    "title": "Etazhi - Remix",
+    "artists": "ANGUISH/дипинс/ily",
+    "file": "./songs/Etazhi - Remix - ANGUISH.mp3",
+    "cover": "./covers/Etazhi - Remix.jpg"
+  },
+  {
     "title": "I Really Want to Stay at Your House",
     "artists": "Rosa Walton/Hallie Coggins",
     "file": "./songs/I Really Want to Stay at Your House - Rosa Walton.mp3",
     "cover": "./covers/I Really Want to Stay at Your House.jpg"
   },
   {
+    "title": "Dying On The Inside",
+    "artists": "La Capella",
+    "file": "./songs/Dying On The Inside - La Capella.mp3",
+    "cover": "./covers/Dying On The Inside.jpg"
+  },
+  {
+    "title": "SAY OUR GOODBYES",
+    "artists": "4GET",
+    "file": "./songs/SAY OUR GOODBYES - 4GET.mp3",
+    "cover": "./covers/SAY OUR GOODBYES.jpg"
+  },
+  {
     "title": "Blinding Lights",
     "artists": "AGONY/kyoto/overrated",
     "file": "./songs/Blinding Lights - AGONY.mp3",
     "cover": "./covers/Blinding Lights.jpg"
+  },
+  {
+    "title": "TEK IT - HARDSTYLE",
+    "artists": "POSEIDON/ZYZZMODE/Tazzy",
+    "file": "./songs/TEK IT - HARDSTYLE - POSEIDON.mp3",
+    "cover": "./covers/TEK IT - HARDSTYLE.jpg"
   }
 ]
