@@ -460,4 +460,4 @@ function pickVibrantColor(palette) {
 // 🎧 WHEN SONG ENDS, AUTOPLAY NEXT
 Song.addEventListener("ended", nextSong);
 
-//format scripts, lockscreen?, ios, play pause button change on media keys, profiles
+//format scripts, lockscreen?, ios, play pause button change on media keys, profiles, add more songs
