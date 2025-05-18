@@ -289,7 +289,7 @@ function loadSong(index, autoplay = false) {
         pause_btn.style.display = "none";
     }
 
-    if ('mediaSession' in navigator) {//lockscreen
+    if ('mediaSession' in navigator) {//lockscreen - Not sure
     navigator.mediaSession.metadata = new MediaMetadata({
         title: songs[currentSong].title,
         artist: songs[currentSong].artists,
@@ -459,3 +459,5 @@ function pickVibrantColor(palette) {
 
 // 🎧 WHEN SONG ENDS, AUTOPLAY NEXT
 Song.addEventListener("ended", nextSong);
+
+//format scripts, lockscreen?, ios, play pause button change on media keys, profiles
