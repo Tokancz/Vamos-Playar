@@ -74,7 +74,6 @@ section.songList {
     position: relative;
     top: -170px;
     flex-direction: column;
-    padding-bottom: 10vh; /* same height as the .tab */
 }
 section.songtab {
     width: 95%;

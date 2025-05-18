@@ -83,6 +83,24 @@ function setup() {
         populateSongList(query);
     });
 
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.setActionHandler('play', () => {
+            Song.play();
+            playstate = true;
+            play_btn.style.display = "none";
+            pause_btn.style.display = "block";
+        });
+
+        navigator.mediaSession.setActionHandler('pause', () => {
+            Song.pause();
+            playstate = false;
+            play_btn.style.display = "block";
+            pause_btn.style.display = "none";
+        });
+
+        navigator.mediaSession.setActionHandler('previoustrack', prevSong);
+        navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+    }
 }
 
 function toggleTab() {
@@ -270,6 +288,17 @@ function loadSong(index, autoplay = false) {
         play_btn.style.display = "block";
         pause_btn.style.display = "none";
     }
+
+    if ('mediaSession' in navigator) {//lockscreen
+    navigator.mediaSession.metadata = new MediaMetadata({
+        title: songs[currentSong].title,
+        artist: songs[currentSong].artists,
+        artwork: [
+            { src: songs[currentSong].cover, sizes: '512x512', type: 'image/jpeg' }
+        ]
+    });
+}
+
 }
 
 // ⏩ NEXT SONG
@@ -430,12 +459,3 @@ function pickVibrantColor(palette) {
 
 // 🎧 WHEN SONG ENDS, AUTOPLAY NEXT
 Song.addEventListener("ended", nextSong);
-
-document.addEventListener('keydown', function(e) {
-    if (e.code === 'Space') { // Spacebar toggles play/pause
-        e.preventDefault(); // prevent page from scrolling down
-        togglePlayPause();
-    }
-});
-//Todo: Fix media Keys
-//search
