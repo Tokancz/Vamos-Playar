@@ -76,6 +76,13 @@ function setup() {
     });
 
     Song.addEventListener("ended", nextSong);
+    
+    const searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("input", () => {
+        const query = searchInput.value;
+        populateSongList(query);
+    });
+
 }
 
 function toggleTab() {
@@ -159,33 +166,45 @@ function toggleTab() {
     }
 }
 
-function populateSongList() {
+function populateSongList(filter = "") {
     const songList = document.getElementById("songList");
-    songList.innerHTML = ""; // clear existing
+    songList.innerHTML = ""; // Clear previous
+
+    const normalizedFilter = filter.toLowerCase();
 
     songs.forEach((song, index) => {
-        const songTab = document.createElement("section");
-        songTab.classList.add("songtab");
-        songTab.dataset.index = index;
+        const title = song.title.toLowerCase();
+        const artist = song.artists.toLowerCase();
 
-        songTab.innerHTML = `
-            <section class="songInfo">
-                <img src="${song.cover}" alt="cover" class="songCover">
-                <section class="songTabDetails">
-                    <h3 class="songName">${song.title}</h3>
-                    <p class="songArtists">${song.artists}</p>
+        if (
+            !normalizedFilter ||
+            title.includes(normalizedFilter) ||
+            artist.includes(normalizedFilter)
+        ) {
+            const songTab = document.createElement("section");
+            songTab.classList.add("songtab");
+            songTab.dataset.index = index;
+
+            songTab.innerHTML = `
+                <section class="songInfo">
+                    <img src="${song.cover}" alt="cover" class="songCover">
+                    <section class="songTabDetails">
+                        <h3 class="songName">${song.title}</h3>
+                        <p class="songArtists">${song.artists}</p>
+                    </section>
                 </section>
-            </section>
-            <p class="songDuration">0:00</p>
-        `;
+                <p class="songDuration">0:00</p>
+            `;
 
-        songTab.addEventListener("click", () => {
-            loadSong(index, true);
-        });
+            songTab.addEventListener("click", () => {
+                loadSong(index, true);
+            });
 
-        songList.appendChild(songTab);
+            songList.appendChild(songTab);
+        }
     });
-    setDurations();
+
+    setDurations(); // Keep durations visible
 }
 
 function setDurations() {
