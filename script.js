@@ -415,22 +415,17 @@ const colorThief = new ColorThief();
 const img = document.getElementById('coverImage');
 
 img.addEventListener('load', () => {
-    if (img.complete && img.naturalHeight !== 0) {
-      const palette = colorThief.getPalette(img, 10); // get 10 colors
-  
-      // Find the best vibrant color, not white/black/gray
-      const accent = pickVibrantColor(palette);
-  
-      const hexAccent = rgbToHex(...accent);
-      console.log('Chosen Accent Color:', hexAccent);
-  
-      // Update the --accent CSS variable
-      document.documentElement.style.setProperty('--accent', hexAccent);
-  
-      // Now update your UI elements with the new accent
-      updateGradient(); // Update slider gradient
-      updateVolumeColor(); // Update volume slider color
-    }
+  console.log('Image loaded:', img.src);
+  if (img.complete && img.naturalHeight !== 0) {
+    const palette = colorThief.getPalette(img, 10);
+    const accent = pickVibrantColor(palette);
+    const hexAccent = rgbToHex(...accent);
+    console.log('Chosen Accent Color:', hexAccent);
+
+    document.documentElement.style.setProperty('--accent', hexAccent);
+    updateGradient();
+    updateVolumeColor();
+  }
 });
 
 // Converts [r, g, b] into a hex string
@@ -457,7 +452,29 @@ function pickVibrantColor(palette) {
   return palette[0];
 }
 
+function hexToRgb(hex) {
+  hex = hex.replace(/^#/, '');
+  if (hex.length === 3) {
+    hex = hex.split('').map(c => c + c).join('');
+  }
+  const num = parseInt(hex, 16);
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
+}
+
+function applyAccentColorToMask(selector, accentColor) {
+  const el = document.querySelector(selector);
+  if (!el) {
+    console.warn('Element not found:', selector);
+    return;
+  }
+  el.style.backgroundColor = accentColor;
+}
+
 // 🎧 WHEN SONG ENDS, AUTOPLAY NEXT
 Song.addEventListener("ended", nextSong);
 
-//format scripts, lockscreen?, ios, play pause button change on media keys, profiles, add more songs
+//format scripts, lockscreen?, ios, play pause button change on media keys, profiles, add more songsa

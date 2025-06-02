@@ -39,9 +39,19 @@ nav {
     
     background-color: var(--backdrop);
 }
-img.logo {
+.logo {
     height: 90%;
-    fill: red;
+    width: 100px;
+  height: 100px;
+  filter: invert(1);
+  background-color: #000; /* fallback */
+  -webkit-mask-image: url("../Images/VPlogo.svg");
+  mask-image: url("../Images/VPLogo.svg");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  display: inline-block;
 }
 section.searchbar {
     width: 400px;
