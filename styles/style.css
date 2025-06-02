@@ -40,6 +40,7 @@ nav {
 }
 .logo {
     height: 90%;
+    color: var(--accent);
 }
 .logo * {
     stroke: var(--accent);
