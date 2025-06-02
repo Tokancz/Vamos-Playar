@@ -36,22 +36,14 @@ nav {
     padding: 0 20px;
     align-items: center;
     justify-content: space-between;
-    
     background-color: var(--backdrop);
 }
 .logo {
     height: 90%;
-    width: 100px;
-  height: 100px;
-  filter: invert(1);
-  background-color: #000; /* fallback */
-  -webkit-mask-image: url("../Images/VPlogo.svg");
-  mask-image: url("../Images/VPLogo.svg");
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  display: inline-block;
+}
+.logo * {
+    stroke: var(--accent);
+    color: var(--accent);
 }
 section.searchbar {
     width: 400px;
