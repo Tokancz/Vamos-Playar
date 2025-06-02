@@ -7,13 +7,20 @@ fetch('./songs.json')
     console.log("Loaded songs:", data);
     songs = data;
     if (songs.length > 0) {
-        populateSongList();
-        loadSong(currentSong, false);
-        setup(); // Call your original setup logic
-    } else {
-        console.error("No songs found in songs.json");
-    }
-  })
+            populateSongList();
+            // 👇 Try to restore last played song
+            const savedSongIndex = parseInt(localStorage.getItem("currentSong"));
+            if (!isNaN(savedSongIndex) && savedSongIndex >= 0 && savedSongIndex < songs.length) {
+                currentSong = savedSongIndex;
+            } else {
+                currentSong = 0;
+            }
+            loadSong(currentSong, false);
+            setup();
+        } else {
+            console.error("No songs found in songs.json");
+        }
+    })
   .catch(err => console.error("Failed to load songs:", err));
 
 // 🔥 SETUP
@@ -49,6 +56,7 @@ function setup() {
     setVolume();
     updateVolumeColor();
     setInterval(updateMusic, 500);
+    restoreVolume();
 
     play_btn.addEventListener('click', togglePlayPause);
     pause_btn.addEventListener('click', togglePlayPause);
@@ -230,7 +238,8 @@ function setDurations() {
 
     tabs.forEach((tab, index) => {
         const audio = new Audio();
-        audio.src = songs[index].file;
+        const tabIndex = parseInt(tab.dataset.index);
+        audio.src = songs[tabIndex].file;
 
         audio.addEventListener("loadedmetadata", () => {
             const dur = audio.duration;
@@ -267,17 +276,17 @@ function setVolume() {
 
 // 🎶 LOAD A SONG FROM QUEUE
 function loadSong(index, autoplay = false) {
+    currentSong = index;
+    localStorage.setItem("currentSong", currentSong); // ⬅️ Save song index
+
     const track = songs[index];
     Song.src = track.file;
     Song.load();
     songTitle.textContent = track.title;
     artists.textContent = track.artists;
 
-    // Update body background
     BG.style.backgroundImage = `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10,10,10,0.4) 100%), url('${track.cover}')`;
-
-    // Update cover image
-    coverImage.src = track.cover;  
+    coverImage.src = track.cover;
 
     if (autoplay || playstate) {
         Song.play();
@@ -289,16 +298,24 @@ function loadSong(index, autoplay = false) {
         pause_btn.style.display = "none";
     }
 
-    if ('mediaSession' in navigator) {//lockscreen - Not sure
-    navigator.mediaSession.metadata = new MediaMetadata({
-        title: songs[currentSong].title,
-        artist: songs[currentSong].artists,
-        artwork: [
-            { src: songs[currentSong].cover, sizes: '512x512', type: 'image/jpeg' }
-        ]
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: track.title,
+            artist: track.artists,
+            artwork: [
+                { src: track.cover, sizes: '512x512', type: 'image/jpeg' }
+            ]
+        });
+    }
+    // ✅ Highlight the active song in the list
+    const songTabs = document.querySelectorAll('.songtab');
+    songTabs.forEach((tab, i) => {
+        if (i === index) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
     });
-}
-
 }
 
 // ⏩ NEXT SONG
@@ -336,6 +353,19 @@ function toggleMute() {
     }
     updateVolumeColor();
 }
+function restoreVolume() {
+    const savedVolume = localStorage.getItem("last_volume");
+    if (savedVolume !== null) {
+        volume = parseFloat(savedVolume);
+        Song.volume = volume;
+        Vslider.value = (1 - volume) * 100;
+        muted = volume === 0;
+        mute_btn.style.display = muted ? "block" : "none";
+        unmute_btn.style.display = muted ? "none" : "block";
+        updateVolumeColor();
+    }
+}
+
 
 async function togglePlayPause() {
     if (Song.paused) {

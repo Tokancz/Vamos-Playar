@@ -93,6 +93,9 @@ section.songtab {
     border-radius: 10px;
     background-color: var(--backdrop);
 }
+.songtab.active {
+    background-color: var(--accent);
+}
 section.songInfo {
     height: 100%;
     width: 90%;
