@@ -74,6 +74,7 @@ section.songList {
     position: relative;
     top: -170px;
     flex-direction: column;
+    align-items: center;
 }
 section.songtab {
     width: 95%;
@@ -82,7 +83,7 @@ section.songtab {
     align-items: center;
     justify-content: space-between;
     gap: 40px;
-    margin: 10px;
+    margin: 5px;
     padding: 10px;
     border-radius: 10px;
     background-color: var(--backdrop);
@@ -124,7 +125,7 @@ section.tab {
     align-items: center;
     gap: 30px;
     background-color: var(--backdrop);
-    border-radius: 20px;
+    border-radius: 10px;
     z-index: 1000;
 }
 p{
