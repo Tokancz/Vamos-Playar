@@ -41,6 +41,7 @@ nav {
 }
 img.logo {
     height: 90%;
+    fill: red;
 }
 section.searchbar {
     width: 400px;
@@ -75,6 +76,7 @@ section.songList {
     top: -170px;
     flex-direction: column;
     align-items: center;
+    margin-top: 10px;
 }
 section.songtab {
     width: 95%;
