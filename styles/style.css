@@ -349,6 +349,8 @@ section.slider.expanded {
 
 @media (width <= 1024px) {
     * { font-size: 1em; }
+    svg .text {display: none;}
+    svg {margin-top: 22px;}
 }
 @media (width <= 768px) {
     * { font-size: .8em; }
