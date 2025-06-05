@@ -5,7 +5,7 @@
     --accent: #C04065;
     --white: #e8e7e7;
     --backdrop: #101010A0;
-    --tab: #181818F0;
+    --tab: #101010F0;
 }
 * {
     font-family: "Source Code Pro", monospace;
@@ -63,6 +63,9 @@ section.searchbar {
     border: none;
     outline: none;
     text-align: left;
+}
+.searchbar input[type="text"]:focus {
+    filter: brightness(1.5);
 }
 i#user {
     font-size: 2em;
@@ -124,16 +127,17 @@ section.songTabDetails {
 }
 .songTabDetails p { 
     text-align: left;
-    filter: drop-shadow(-5px 5px 5px black);
+    filter: drop-shadow(-5px 5px 10px black);
 }
 .songTabDetails h3 {
     text-align: left;
     font-size: 1.8em;
     font-weight: 500;
-    filter: drop-shadow(-3px 3px 5px var(--backdrop));
+    filter: drop-shadow(-3px 3px 10px var(--backdrop));
 }
 p.songDuration {
     width: 6%;
+    filter: drop-shadow(-5px 5px 10px black);
 }
 
 /* Everything else stays above the cover */
@@ -222,6 +226,7 @@ section.SongCover {
     display: flex;
     justify-content: end;
     gap: 20px;
+    filter: drop-shadow(-3px 3px 10px var(--backdrop));
 }
 section.yap {
     height: 100%;
