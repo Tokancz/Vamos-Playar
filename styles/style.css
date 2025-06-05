@@ -4,7 +4,7 @@
     --primary: #FFFFFF90;
     --accent: #C04065;
     --white: #e8e7e7;
-    --backdrop: #20202080;
+    --backdrop: #101010A0;
     --tab: #181818F0;
 }
 * {
@@ -84,6 +84,7 @@ section.songList {
 section.songtab {
     width: 95%;
     height: 80px;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -91,10 +92,17 @@ section.songtab {
     margin: 5px;
     padding: 10px;
     border-radius: 10px;
-    background-color: var(--backdrop);
+    overflow: hidden;
 }
-.songtab.active {
-    background: var(--accent);
+.cover-bg {
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+    opacity: .6;
+    transition: opacity 0.3s ease;
 }
 section.songInfo {
     height: 100%;
@@ -107,20 +115,39 @@ section.songInfo {
     height: 95%;
     border-radius: 10px;
     align-content: flex-start;
+    box-shadow: 0 0 5px var(--backdrop);
 }
 section.songTabDetails {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
-.songTabDetails p { text-align: left; }
+.songTabDetails p { 
+    text-align: left;
+    filter: drop-shadow(-5px 5px 5px black);
+}
 .songTabDetails h3 {
     text-align: left;
     font-size: 1.8em;
     font-weight: 500;
+    filter: drop-shadow(-3px 3px 5px var(--backdrop));
 }
 p.songDuration {
     width: 6%;
+}
+
+/* Everything else stays above the cover */
+.songInfo,
+.songDuration {
+    position: relative;
+    z-index: 1;
+}
+/* Highlight active tab by hiding background or overriding it */
+.songtab.active .cover-bg {
+    opacity: 0;
+}
+.songtab.active {
+    background: var(--accent);
 }
 section.tab {
     position:sticky;

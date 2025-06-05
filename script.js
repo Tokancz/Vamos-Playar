@@ -211,9 +211,12 @@ function populateSongList(filter = "") {
             songTab.classList.add("songtab");
             songTab.dataset.index = index;
 
+            const encodedCoverURL = encodeURI(song.cover);
+
             songTab.innerHTML = `
+                <div class="cover-bg" style="background-image: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,1) 60%), url('${encodedCoverURL}')"></div>
                 <section class="songInfo">
-                    <img src="${song.cover}" alt="cover" class="songCover">
+                    <img src="${encodedCoverURL}" alt="cover" class="songCover">
                     <section class="songTabDetails">
                         <h3 class="songName">${song.title}</h3>
                         <p class="songArtists">${song.artists}</p>
@@ -221,14 +224,6 @@ function populateSongList(filter = "") {
                 </section>
                 <p class="songDuration">0:00</p>
             `;
-            
-            const encodedCoverURL = encodeURI(song.cover);
-            songTab.style.background = `
-                linear-gradient(90deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 1) 70%), 
-                url("${encodedCoverURL}")
-            `;
-            songTab.style.backgroundRepeat = "no-repeat";
-            songTab.style.backgroundSize = "cover";
 
             console.log(`[${index}] Cover URL:`, song.cover);
 
