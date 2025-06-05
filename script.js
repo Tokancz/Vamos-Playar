@@ -221,6 +221,16 @@ function populateSongList(filter = "") {
                 </section>
                 <p class="songDuration">0:00</p>
             `;
+            
+            const encodedCoverURL = encodeURI(song.cover);
+            songTab.style.background = `
+                linear-gradient(90deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 1) 70%), 
+                url("${encodedCoverURL}")
+            `;
+            songTab.style.backgroundRepeat = "no-repeat";
+            songTab.style.backgroundSize = "cover";
+
+            console.log(`[${index}] Cover URL:`, song.cover);
 
             songTab.addEventListener("click", () => {
                 loadSong(index, true);

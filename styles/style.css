@@ -94,7 +94,7 @@ section.songtab {
     background-color: var(--backdrop);
 }
 .songtab.active {
-    background-color: var(--accent);
+    background: var(--accent);
 }
 section.songInfo {
     height: 100%;
