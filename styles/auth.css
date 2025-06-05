@@ -30,3 +30,37 @@ main {
     flex-direction: column;
     align-items: center;
 }
+#auth-container {
+  padding: 30px;
+  border-radius: 20px;
+  background: var(--tab);
+  margin-top: 100px;
+  width: 90%;
+  max-width: 400px;
+}
+
+#auth-container input {
+  margin: 10px 0;
+  padding: 10px;
+  width: 90%;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  background: #ffffff10;
+  color: white;
+}
+
+#auth-container button {
+  margin: 10px 5px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+#auth-container button:hover {
+  opacity: 0.8;
+}

@@ -17,9 +17,27 @@
 </head>
 <body>
     <main>
-        
+        <section id="auth-container">
+            <h2>Vamos Playar - Login</h2>
+
+            <form id="auth-form">
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="password" placeholder="Password" required>
+
+                <div class="buttons">
+                <button type="button" id="signup">Sign Up</button>
+                <button type="button" id="login">Login</button>
+                <button type="button" id="logout" style="display: none;">Logout</button>
+                </div>
+            </form>
+
+            <p id="auth-status"></p>
+        </section>
+
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="login.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

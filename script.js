@@ -225,8 +225,6 @@ function populateSongList(filter = "") {
                 <p class="songDuration">0:00</p>
             `;
 
-            console.log(`[${index}] Cover URL:`, song.cover);
-
             songTab.addEventListener("click", () => {
                 loadSong(index, true);
             });
