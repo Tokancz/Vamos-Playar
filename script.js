@@ -214,7 +214,7 @@ function populateSongList(filter = "") {
             const encodedCoverURL = encodeURI(song.cover);
 
             songTab.innerHTML = `
-                <div class="cover-bg" style="background-image: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,1) 60%), url('${encodedCoverURL}')"></div>
+                <div class="cover-bg" style="background-image: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(10,10,10,1) 70%), url('${encodedCoverURL}')"></div>
                 <section class="songInfo">
                     <img src="${encodedCoverURL}" alt="cover" class="songCover">
                     <section class="songTabDetails">

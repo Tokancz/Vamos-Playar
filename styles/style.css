@@ -181,6 +181,7 @@ i#X {
     left: 50px;
     font-size: 2em;
     transition: .3s;
+    filter: drop-shadow(-5px 5px 10px black);
 }
 section.volume {
     height: 130px;
@@ -376,8 +377,6 @@ section.slider.expanded {
 #artists.expanded {
     display: block;
 }
-
-
 
 @media (width <= 1024px) {
     * { font-size: 1em; }
