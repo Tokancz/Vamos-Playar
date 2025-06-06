@@ -25,7 +25,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (error) {
       statusEl.textContent = `Login failed: ${error.message}`
     } else {
-      statusEl.textContent = `Logged in as ${email}`
+      window.location.href = "/profile.html";
     }
   }
 

@@ -91,6 +91,16 @@ function setup() {
         populateSongList(query);
     });
 
+    document.getElementById("profile-icon").addEventListener("click", async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            window.location.href = "/profile.html";
+        } else {
+            window.location.href = "/auth.html";
+        }
+    });
+
+
     if ('mediaSession' in navigator) {
         navigator.mediaSession.setActionHandler('play', () => {
             Song.play();
