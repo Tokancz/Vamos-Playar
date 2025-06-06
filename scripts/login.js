@@ -41,33 +41,52 @@ window.addEventListener("DOMContentLoaded", () => {
     const avatar = avatarInput.value || null;
 
     if (isLogin) {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      // Login flow
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) return alert("Login failed: " + error.message);
+      window.location.href = "profile.html";
+    } else {
+      // Signup flow
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: name,
+            avatar_url: avatar,
+          },
+        },
+      });
 
-      const user = data.user;
-      if (!user) return alert("User not found after login.");
-
-      // Check if profile exists
-      const { data: profiles, error: profileFetchError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (profileFetchError && profileFetchError.code === 'PGRST116') {
-        // No profile row found, create it
-        const { error: profileInsertError } = await supabase.from("profiles").insert([{
-          id: user.id,
-          username: nameInput.value || null,
-          avatar_url: avatarInput.value || null,
-          minutes_listened: 0,
-          top_artist: null,
-          songs_listened_to: 0,
-        }]);
-
-        if (profileInsertError) return alert("Failed to create profile: " + profileInsertError.message);
+      if (signUpError) {
+        return alert("Signup failed: " + signUpError.message);
       }
 
+      const user = signUpData.user;
+
+      if (!user) {
+        return alert("User not available yet, please confirm your email or try again.");
+      }
+
+      // Insert profile row in your profiles table
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert([
+          {
+            id: user.id,
+            username: name,
+            avatar_url: avatar || null,
+            minutes_listened: 0,
+            top_artist: null,
+            songs_listened_to: 0,
+          },
+        ]);
+
+      if (profileError) {
+        return alert("Failed to create profile: " + profileError.message);
+      }
+
+      alert("Signed up! Please check your email.");
       window.location.href = "profile.html";
     }
   });
