@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const supabase = window.supabase.createClient(
     'https://bmblkqgeaaezttikpxxf.supabase.co',
-    'YOUR_PUBLIC_ANON_KEY'
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtYmxrcWdlYWFlenR0aWtweHhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzY3MzMsImV4cCI6MjA2NDUxMjczM30.4TRpAxHihyPQnvuaMOZP5DnGre2OLYu9YQJIn2cXsrE'
   );
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -16,13 +16,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (error) return alert("Failed to fetch profile");
 
   // Render profile
-  document.getElementById("profileName").textContent = data.name;
+  document.getElementById("profileName").textContent = data.username;
   document.getElementById("profileEmail").textContent = user.email;
   document.getElementById("profileAvatar").src = data.avatar_url;
   document.getElementById("profileStats").textContent = `
     Minutes listened: ${data.minutes_listened || 0}
     Songs listened: ${data.songs_listened || 0}
     Top artist: ${data.top_artist || "N/A"}
+    Avatar url: ${data.avatar_url || "N/A"}
   `;
 
   document.getElementById("logout").addEventListener("click", async () => {
