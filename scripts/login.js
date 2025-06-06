@@ -1,86 +1,55 @@
-window.addEventListener("DOMContentLoaded", () => {
-  const supabaseUrl = 'https://bmblkqgeaaezttikpxxf.supabase.co'
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtYmxrcWdlYWFlenR0aWtweHhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzY3MzMsImV4cCI6MjA2NDUxMjczM30.4TRpAxHihyPQnvuaMOZP5DnGre2OLYu9YQJIn2cXsrE'
+// Supabase setup (define AFTER library is loaded, now it's guaranteed via defer)
+const supabaseUrl = 'https://bmblkqgeaaezttikpxxf.supabase.co';
+const supabaseKey = 'your-key-here';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("authForm");
+  const toggleBtn = document.getElementById("toggleForm");
+  const toggleText = document.getElementById("toggleText");
+  const submitBtn = document.getElementById("submitBtn");
+  const title = document.getElementById("formTitle");
 
-  const emailInput = document.getElementById('email')
-  const passwordInput = document.getElementById('password')
-  const signupBtn = document.getElementById('signup')
-  const loginBtn = document.getElementById('login')
-  const logoutBtn = document.getElementById('logout')
-  const statusEl = document.getElementById('auth-status')
+  let isLogin = false;
 
-  async function signUp(email, password) {
-    const { error } = await supabase.auth.signUp({ email, password })
-    if (error) {
-      statusEl.textContent = `Signup failed: ${error.message}`
+  toggleBtn.addEventListener("click", () => {
+    isLogin = !isLogin;
+    submitBtn.textContent = isLogin ? "Log In" : "Sign Up";
+    toggleText.textContent = isLogin
+      ? "Don't have an account?"
+      : "Already have an account?";
+    title.textContent = isLogin ? "Log In" : "Sign Up";
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = form.email.value;
+    const password = form.password.value;
+    const name = form.name?.value || null;
+    const avatar = form.avatar?.value || null;
+
+    if (isLogin) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) return alert("Login failed: " + error.message);
+      alert("Logged in!");
+      window.location.href = "profile.html";
     } else {
-      statusEl.textContent = 'Signup successful! Please check your email to confirm.'
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            avatar,
+          },
+        },
+      });
+      if (error) return alert("Signup failed: " + error.message);
+      alert("Signed up! Check your email.");
+      window.location.href = "profile.html";
     }
-  }
-
-  async function signIn(email, password) {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      statusEl.textContent = `Login failed: ${error.message}`
-    } else {
-      window.location.href = "/profile.html";
-    }
-  }
-
-  async function signOut() {
-    const { error } = await supabase.auth.signOut()
-    if (error) {
-      statusEl.textContent = `Logout failed: ${error.message}`
-    } else {
-      statusEl.textContent = `Logged out.`
-    }
-  }
-
-  signupBtn.addEventListener('click', () => {
-    signUp(emailInput.value, passwordInput.value)
-  })
-
-  loginBtn.addEventListener('click', () => {
-    signIn(emailInput.value, passwordInput.value)
-  })
-
-  logoutBtn.addEventListener('click', () => {
-    signOut()
-  })
-
-  supabase.auth.onAuthStateChange((event, session) => {
-    console.log('Auth event:', event)
-
-    if (session) {
-      logoutBtn.style.display = 'inline-block'
-      loginBtn.style.display = 'none'
-      signupBtn.style.display = 'none'
-      emailInput.disabled = true
-      passwordInput.disabled = true
-      statusEl.textContent = `Logged in as ${session.user.email}`
-    } else {
-      logoutBtn.style.display = 'none'
-      loginBtn.style.display = 'inline-block'
-      signupBtn.style.display = 'inline-block'
-      emailInput.disabled = false
-      passwordInput.disabled = false
-      statusEl.textContent = `Not logged in`
-    }
-  })
-
-  // Check session on load
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    if (session) {
-      logoutBtn.style.display = 'inline-block'
-      loginBtn.style.display = 'none'
-      signupBtn.style.display = 'none'
-      emailInput.disabled = true
-      passwordInput.disabled = true
-      statusEl.textContent = `Logged in as ${session.user.email}`
-    } else {
-      statusEl.textContent = `Not logged in`
-    }
-  })
-})
+  });
+});

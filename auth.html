@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="./styles/profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="icon" type="image/png" href="Images/favicon.ico">    
-    <title>Vamos Playar</title>
+    <title>Vamos Playar - Login</title>
 </head>
 <body>
     <a href="index.html">
@@ -33,26 +33,22 @@
        
     <main>
         <section id="auth-container">
-            <h2>Login</h2>
-
-            <form id="auth-form">
-                <input type="email" id="email" placeholder="Email" required>
-                <input type="password" id="password" placeholder="Password" required>
-
-                <div class="buttons">
-                <button type="button" id="signup">Sign Up</button>
-                <button type="button" id="login">Login</button>
-                <button type="button" id="logout" style="display: none;">Logout</button>
-                </div>
+            <h2 id="formTitle">Sign Up</h2>
+            <form id="authForm">
+                <input type="email" name="email" required placeholder="Email" />
+                <input type="password" name="password" required placeholder="Password" />
+                <input type="text" name="name" placeholder="Name (signup only)" />
+                <input type="text" name="avatar" placeholder="Profile Picture URL (optional)" />
+                <button type="submit" id="submitBtn">Sign Up</button>
             </form>
-
-            <p id="auth-status"></p>
+            <p>
+                <span id="toggleText">Already have an account?</span>
+                <button id="toggleForm">Switch to Login</button>
+            </p>
         </section>
-
     </main>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script src="scripts/login.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js" defer></script>
+    <script src="scripts/login.js" defer></script>
 </body>
 </html>
 
