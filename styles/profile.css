@@ -15,13 +15,28 @@
 }
 body {
     width: 100%;
-    backdrop-filter: blur(30px) brightness(.3);
+    backdrop-filter: blur(15px) brightness(.3);
+    background-image: url("../images/VPLogoWithText.png");
     background-position: center;
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: 100%;
     background-attachment: fixed;
     transition: background-image 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out;
     background-color: black;
+}
+a {
+    position: fixed;
+    top: 0;
+    left: 0;
+    color: var(--accent);
+}
+.logo {
+  height: 80px;
+  width: 80px;
+}
+.logo * {
+    stroke: var(--accent);
+    color: var(--accent);
 }
 main {
     width: 100%;
@@ -31,29 +46,38 @@ main {
     align-items: center;
 }
 #auth-container {
-  padding: 30px;
-  border-radius: 20px;
-  background: var(--tab);
-  margin-top: 100px;
   width: 90%;
-  max-width: 400px;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 30px;
+  border-radius: 10px;
+  background: var(--backdrop);
+  margin-top: 150px;
+}
+
+#auth-container h2{
+  font-size: 2em;
 }
 
 #auth-container input {
   margin: 10px 0;
   padding: 10px;
   width: 90%;
-  border-radius: 10px;
+  border-radius: 5px;
   border: none;
   outline: none;
   background: #ffffff10;
   color: white;
+  font-size: 1em;
+  font-weight: 500;
 }
 
 #auth-container button {
   margin: 10px 5px;
   padding: 10px 20px;
-  border-radius: 10px;
+  border-radius: 5px;
   border: none;
   background: var(--accent);
   color: white;

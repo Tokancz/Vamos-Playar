@@ -91,7 +91,7 @@ function setup() {
         populateSongList(query);
     });
 
-    document.getElementById("profile-icon").addEventListener("click", async () => {
+    document.getElementById("user").addEventListener("click", async () => {
     const { data: { session } } = await supabase.auth.getSession();
         if (session) {
             window.location.href = "/profile.html";

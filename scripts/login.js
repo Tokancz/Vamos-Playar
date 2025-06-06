@@ -1,6 +1,6 @@
 window.addEventListener("DOMContentLoaded", () => {
   const supabaseUrl = 'https://bmblkqgeaaezttikpxxf.supabase.co'
-  const supabaseKey = 'your_anon_key_here'
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtYmxrcWdlYWFlenR0aWtweHhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzY3MzMsImV4cCI6MjA2NDUxMjczM30.4TRpAxHihyPQnvuaMOZP5DnGre2OLYu9YQJIn2cXsrE'
 
   const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
 
