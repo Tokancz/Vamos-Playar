@@ -31,15 +31,16 @@ fetch('./songs.json')
 // 🔥 SETUP
 let currentSong = 0;
 let playstate = false;
+let volume = parseFloat(localStorage.getItem("last_volume"));
+if (isNaN(volume)) volume = 0.05; // fallback to 5% if not saved
 let Song = new Audio();
-let volume = .05;
+Song.volume = volume;
 let invertedValue = 100;
 let muted = false;
 let tabOpen = false;
 let playStartTime = null;
 let accumulatedPlayTime = 0;
 let songTracked = false;
-Song.volume = volume;
 
 const play_btn = document.getElementById("play");
 const pause_btn = document.getElementById("pause");
@@ -349,9 +350,6 @@ async function updateListeningStats(forceFinished = false) {
     }
 }
 
-
-
-
 function setDurations() {
     const tabs = document.querySelectorAll(".songtab");
 
@@ -376,7 +374,6 @@ function setVolume() {
     invertedValue = 100 - Vslider.value;
     volume = invertedValue / 100;
     muted = volume === 0;
-    localStorage.setItem("last_volume", volume);
 
     if (volume == 0) {
         mute_btn.style.display = "block";
@@ -480,15 +477,24 @@ function toggleMute() {
     }
     updateVolumeColor();
 }
+
 function restoreVolume() {
-    const savedVolume = localStorage.getItem("last_volume");
-    if (savedVolume !== null) {
-        volume = parseFloat(savedVolume);
+    const savedVolume = parseFloat(localStorage.getItem("last_volume"));
+    if (!isNaN(savedVolume)) {
+        volume = savedVolume;
+        invertedValue = 100 - volume * 100;
+        Vslider.value = invertedValue;
         Song.volume = volume;
-        Vslider.value = (1 - volume) * 100;
         muted = volume === 0;
-        mute_btn.style.display = muted ? "block" : "none";
-        unmute_btn.style.display = muted ? "none" : "block";
+
+        if (volume === 0) {
+            mute_btn.style.display = "block";
+            unmute_btn.style.display = "none";
+        } else {
+            mute_btn.style.display = "none";
+            unmute_btn.style.display = "block";
+        }
+
         updateVolumeColor();
     }
 }
