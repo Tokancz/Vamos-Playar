@@ -7,9 +7,9 @@
     --backdrop: #101010A0;
     --tab: #101010F9;
 }
-* {
+*:not(text) {
     font-family: "Source Code Pro", monospace;
-    font-size: 1.3em;
+    font-size: 1em;
     text-align: center;
     color: var(--white);
 }
@@ -378,19 +378,13 @@ section.slider.expanded {
     display: block;
 }
 
-@media (width <= 1024px) {
-    * { font-size: 1em; }
-    svg .text {display: none;}
-    svg {margin-top: 22px;}
-}
 @media (width <= 768px) {
-    * { font-size: .8em; }
     #tab.expanded {width: 45%;}
     section.songtab { gap: 10px; padding: 5px;}
     #tab.collapsed {height: 10%; padding: 10px;}
 }
 @media (width <= 425px) {
-    * { font-size: .7em; }
+    *:not(text) { font-size: .98em; }
     body { background-size: 200%;}
     nav {padding: 0px;}
     section.searchbar {width: 200px;}
@@ -409,7 +403,7 @@ section.slider.expanded {
     #prevBtn.collapsed, #nextBtn.collapsed {display: none;}
 }
 @media (width <= 320px) {
-    * { font-size: .6em; }
+    *:not(text) { font-size: .95em; }
     body { background-size: 250%;}
     #tab.expanded {width: 80%;bottom: 15%;}
     p#artists.collapsed {display: none;}
