@@ -388,7 +388,7 @@ function setVolume() {
     updateVolumeColor();
 }
 
-// 🎶 LOAD A SONG FROM QUEUE
+// 🎶 LOAD A SONG FROM QUEUe
 function loadSong(index, autoplay = false) {
     currentSong = index;
     localStorage.setItem("currentSong", currentSong); // ⬅️ Save song index
