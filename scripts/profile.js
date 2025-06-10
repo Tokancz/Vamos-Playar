@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     Minutes listened: ${data.minutes_listened || 0}
     Songs listened: ${data.songs_listened || 0}
     Top artist: ${data.top_artist || "N/A"}
-    Avatar url: ${data.avatar_url || "N/A"}
   `;
 
   document.getElementById("logout").addEventListener("click", async () => {

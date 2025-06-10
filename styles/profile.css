@@ -1,34 +1,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
 
 :root {
-    --primary: #FFFFFF90;
-    --accent: #C04065;
-    --white: #e8e7e7;
-    --backdrop: #101010A0;
-    --tab: #101010F0;
+  --primary: #FFFFFF90;
+  --accent: #C04065;
+  --white: #e8e7e7;
+  --backdrop: #101010A0;
+  --tab: #101010F0;
 }
 * {
-    font-family: "Source Code Pro", monospace;
-    font-size: 1.3em;
-    text-align: center;
-    color: var(--white);
+  font-family: "Source Code Pro", monospace;
+  font-size: 1.3em;
+  text-align: center;
+  color: var(--white);
 }
 body {
-    width: 100%;
-    backdrop-filter: blur(15px) brightness(.3);
-    background-image: url("../images/VPLogoWithText.png");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 100%;
-    background-attachment: fixed;
-    transition: background-image 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out;
-    background-color: black;
+  width: 100%;
+  backdrop-filter: blur(15px) brightness(.3);
+  background-image: url("../images/VPLogoWithText.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-attachment: fixed;
+  transition: background-image 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out;
+  background-color: black;
 }
 a {
-    position: fixed;
-    top: 0;
-    left: 0;
-    color: var(--accent);
+  position: fixed;
+  top: 0;
+  left: 0;
+  color: var(--accent);
 }
 .logo {
   height: 80px;
@@ -39,11 +39,14 @@ a {
     color: var(--accent);
 }
 main {
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
 }
 #auth-container {
   width: 90%;
@@ -54,7 +57,6 @@ main {
   padding: 30px;
   border-radius: 10px;
   background: var(--backdrop);
-  margin-top: 150px;
 }
 
 #auth-container h2{
@@ -74,7 +76,7 @@ main {
   font-weight: 500;
 }
 
-#auth-container button {
+button {
   margin: 10px 5px;
   padding: 10px 20px;
   border-radius: 5px;
@@ -85,6 +87,67 @@ main {
   transition: 0.2s ease;
 }
 
-#auth-container button:hover {
+button:hover {
   opacity: 0.8;
+}
+
+section.profileCard {
+  position: relative;
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 15px;
+  background-color: var(--backdrop);
+  box-shadow: 5px 5px 15px black;
+}
+
+section.profile {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background-color: var(--accent);
+  padding: 50px 0;
+  border-radius: 15px 15px 0 0;
+}
+
+.profile img {
+  position: absolute;
+  width: 180px;
+  left: 20px;
+  top: 20px;
+  border-radius: 50px;
+  filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.3));
+}
+
+.profile p {
+  text-align: left;
+}
+
+.profile div {
+  position: relative;
+  left: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile #profileName {
+  font-size: 2em;
+  font-weight: 600;
+}
+
+section.stats {
+  padding: 20px 0;
+  width: 80%;
+}
+.stats h3 {
+  font-size: 1.3em;
+  font-weight: 500;
+}
+#profileStats {
+  text-align: left;
+  line-height: 35px;
 }
