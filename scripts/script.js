@@ -1,12 +1,17 @@
 // 🎵 SONGS QUEUE
 let songs = [];
 
+const supabase = window.supabase.createClient(
+    'https://bmblkqgeaaezttikpxxf.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtYmxrcWdlYWFlenR0aWtweHhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzY3MzMsImV4cCI6MjA2NDUxMjczM30.4TRpAxHihyPQnvuaMOZP5DnGre2OLYu9YQJIn2cXsrE'
+);
+
 fetch('./songs.json')
-  .then(res => res.json())
-  .then(data => {
-    console.log("Loaded songs:", data);
-    songs = data;
-    if (songs.length > 0) {
+    .then(res => res.json())
+    .then(data => {
+        console.log("Loaded songs:", data);
+        songs = data;
+        if (songs.length > 0) {
             populateSongList();
             // 👇 Try to restore last played song
             const savedSongIndex = parseInt(localStorage.getItem("currentSong"));
@@ -21,7 +26,7 @@ fetch('./songs.json')
             console.error("No songs found in songs.json");
         }
     })
-  .catch(err => console.error("Failed to load songs:", err));
+    .catch(err => console.error("Failed to load songs:", err));
 
 // 🔥 SETUP
 let currentSong = 0;
@@ -31,6 +36,9 @@ let volume = .05;
 let invertedValue = 100;
 let muted = false;
 let tabOpen = false;
+let playStartTime = null;
+let accumulatedPlayTime = 0;
+let songTracked = false;
 Song.volume = volume;
 
 const play_btn = document.getElementById("play");
@@ -58,23 +66,23 @@ function setup() {
     setInterval(updateMusic, 500);
     restoreVolume();
 
-    play_btn.addEventListener('click', togglePlayPause);
-    pause_btn.addEventListener('click', togglePlayPause);
-    next_btn.addEventListener("click", nextSong);
-    prev_btn.addEventListener("click", prevSong);
-    mute_btn.addEventListener("click", toggleMute);
-    unmute_btn.addEventListener("click", toggleMute);
+    play_btn.addEventListener('pointerdown', togglePlayPause);
+    pause_btn.addEventListener('pointerdown', togglePlayPause);
+    next_btn.addEventListener("pointerdown", nextSong);
+    prev_btn.addEventListener("pointerdown", prevSong);
+    mute_btn.addEventListener("pointerdown", toggleMute);
+    unmute_btn.addEventListener("pointerdown", toggleMute);
     slider.addEventListener("input", updateGradient);
     slider.addEventListener("change", seekSong);
     Vslider.addEventListener("input", () => {
         setVolume();
         updateVolumeColor();
     });
-    cross.addEventListener("click", () => {
+    cross.addEventListener("pointerdown", () => {
         triggerAnimation();
         setTimeout(() => toggleTab(), 500);
     });
-    coverImage.addEventListener("click", toggleTab);
+    coverImage.addEventListener("pointerdown", toggleTab);
 
     window.addEventListener("load", () => {
         const savedTabState = localStorage.getItem("tabState");
@@ -83,16 +91,29 @@ function setup() {
         }
     });
 
+    Song.addEventListener("play", () => {
+        playStartTime = Date.now();
+        songTracked = false;
+    });
+
+    Song.addEventListener("pause", async () => {
+        updateListeningStats();
+    });
+
+    Song.addEventListener("ended", async () => {
+        updateListeningStats(true); // force "finished" if song ends naturally
+    });
+
     Song.addEventListener("ended", nextSong);
-    
+
     const searchInput = document.getElementById("searchInput");
     searchInput.addEventListener("input", () => {
         const query = searchInput.value;
         populateSongList(query);
     });
 
-    document.getElementById("user").addEventListener("click", async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    document.getElementById("user").addEventListener("pointerdown", async () => {
+        const { data: { session } } = await supabase.auth.getSession();
         if (session) {
             window.location.href = "/profile.html";
         } else {
@@ -246,6 +267,91 @@ function populateSongList(filter = "") {
     setDurations(); // Keep durations visible
 }
 
+async function updateListeningStats(forceFinished = false) {
+    if (playStartTime === null) return;
+
+    const elapsedSeconds = Math.floor((Date.now() - playStartTime) / 1000);
+    accumulatedPlayTime += elapsedSeconds;
+    playStartTime = null;
+
+    // Get current song info
+    const song = songs[currentSong];
+    const artist = song.artists;
+
+    // Update minutes listened
+    const minutesListened = Math.floor(accumulatedPlayTime / 60);
+    accumulatedPlayTime %= 60; // keep remainder
+
+    // Check if song qualifies as "listened"
+    const songDuration = song.duration || 0;
+    const qualifiesAsListened = forceFinished || elapsedSeconds >= 30 || elapsedSeconds >= songDuration;
+
+    // Get current user
+    const {
+        data: { user },
+        error: userError
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+        console.error("No user is logged in:", userError);
+        return;
+    }
+
+    // Fetch user profile
+    const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("minutes_listened, songs_listened_to, artist_counts")
+        .eq("id", user.id)
+        .single();
+
+    if (profileError) {
+        console.error("Error fetching profile:", profileError);
+        return;
+    }
+
+    // Calculate updated stats
+    const newMinutes = (profile.minutes_listened || 0) + minutesListened;
+    const newSongs = qualifiesAsListened
+        ? (profile.songs_listened_to || 0) + 1
+        : (profile.songs_listened_to || 0);
+
+    // Update artist_counts object
+    const artistCounts = profile.artist_counts || {};
+    if (qualifiesAsListened) {
+        artistCounts[artist] = (artistCounts[artist] || 0) + 1;
+    }
+
+    // Determine top artist
+    let topArtist = "Unknown";
+    let topCount = 0;
+    for (const [a, count] of Object.entries(artistCounts)) {
+        if (count > topCount) {
+            topArtist = a;
+            topCount = count;
+        }
+    }
+
+    // Update the profile in Supabase
+    const { error: updateError } = await supabase
+        .from("profiles")
+        .update({
+            minutes_listened: newMinutes,
+            songs_listened_to: newSongs,
+            artist_counts: artistCounts,
+            top_artist: topArtist
+        })
+        .eq("id", user.id);
+
+    if (updateError) {
+        console.error("Error updating profile stats:", updateError);
+    } else {
+        console.log("Profile stats updated.");
+    }
+}
+
+
+
+
 function setDurations() {
     const tabs = document.querySelectorAll(".songtab");
 
@@ -259,7 +365,7 @@ function setDurations() {
             const minutes = Math.floor(dur / 60);
             const seconds = Math.floor(dur % 60).toString().padStart(2, "0");
             const durationText = `${minutes}:${seconds}`;
-            
+
             const durationEl = tab.querySelector(".songDuration");
             if (durationEl) durationEl.textContent = durationText;
         });
@@ -267,12 +373,10 @@ function setDurations() {
 }
 
 function setVolume() {
-
-    if (invertedValue != 100 - Vslider.value) {
-        invertedValue = 100 - Vslider.value;
-        volume = Math.round(invertedValue) / 100;
-        muted = false;
-    }
+    invertedValue = 100 - Vslider.value;
+    volume = invertedValue / 100;
+    muted = volume === 0;
+    localStorage.setItem("last_volume", volume);
 
     if (volume == 0) {
         mute_btn.style.display = "block";
@@ -332,9 +436,19 @@ function loadSong(index, autoplay = false) {
 }
 
 // ⏩ NEXT SONG
+let shuffle = false; //need to add html
+
 function nextSong() {
-    currentSong = (currentSong + 1) % songs.length;
-    loadSong(currentSong, true); // always autoplay after skipping
+    if (shuffle) {
+        let next;
+        do {
+            next = Math.floor(Math.random() * songs.length);
+        } while (next === currentSong);
+        currentSong = next;
+    } else {
+        currentSong = (currentSong + 1) % songs.length;
+    }
+    loadSong(currentSong, true);
 }
 
 // ⏪ PREVIOUS SONG
@@ -344,10 +458,10 @@ function prevSong() {
 }
 
 function toggleMute() {
-    if (!muted) { 
+    if (!muted) {
         localStorage.setItem("last_volume", volume);
         volume = 0;
-    } else { 
+    } else {
         volume = parseFloat(localStorage.getItem("last_volume")) || 0.05; // Default if null
     }
     muted = !muted;
@@ -418,8 +532,8 @@ function updateMusic() {
 function updateGradient() {
     // Fetch the updated value of --accent after it has been set in the :root
     const accent = getComputedStyle(document.documentElement)
-      .getPropertyValue('--accent')
-      .trim();
+        .getPropertyValue('--accent')
+        .trim();
     const val = (slider.value - slider.min) / (slider.max - slider.min) * 100;
     slider.style.background = `linear-gradient(to right, ${accent} 0%, #ddd ${val}%)`;
 }
@@ -427,8 +541,8 @@ function updateGradient() {
 function updateVolumeColor() {
     // Fetch the updated value of --accent after it has been set in the :root
     const accent = getComputedStyle(document.documentElement)
-      .getPropertyValue('--accent')
-      .trim();
+        .getPropertyValue('--accent')
+        .trim();
     const val = (Vslider.value - Vslider.min) / (Vslider.max - Vslider.min) * 100;
     Vslider.style.background = `linear-gradient(to bottom, #ddd ${val}%, ${accent} ${val}%)`;
 }
@@ -458,66 +572,61 @@ const colorThief = new ColorThief();
 const img = document.getElementById('coverImage');
 
 img.addEventListener('load', () => {
-  console.log('Image loaded:', img.src);
-  if (img.complete && img.naturalHeight !== 0) {
-    const palette = colorThief.getPalette(img, 10);
-    const accent = pickVibrantColor(palette);
-    const hexAccent = rgbToHex(...accent);
-    console.log('Chosen Accent Color:', hexAccent);
+    console.log('Image loaded:', img.src);
+    if (img.complete && img.naturalHeight !== 0) {
+        const palette = colorThief.getPalette(img, 10);
+        const accent = pickVibrantColor(palette);
+        const hexAccent = rgbToHex(...accent);
+        console.log('Chosen Accent Color:', hexAccent);
 
-    document.documentElement.style.setProperty('--accent', hexAccent);
-    updateGradient();
-    updateVolumeColor();
-  }
+        document.documentElement.style.setProperty('--accent', hexAccent);
+        updateGradient();
+        updateVolumeColor();
+    }
 });
 
 // Converts [r, g, b] into a hex string
 function rgbToHex(r, g, b) {
-  return "#" + [r, g, b].map(x => x.toString(16).padStart(2, "0")).join('');
+    return "#" + [r, g, b].map(x => x.toString(16).padStart(2, "0")).join('');
 }
 
 // Picks the most vibrant color (not white/black/grayish)
 function pickVibrantColor(palette) {
-  for (const color of palette) {
-    const [r, g, b] = color;
-    const brightness = (r + g + b) / 3;
+    for (const color of palette) {
+        const [r, g, b] = color;
+        const brightness = (r + g + b) / 3;
 
-    // Ignore very bright (white-ish) and very dark (black-ish) colors
-    if (brightness > 40 && brightness < 220) {
-      // Also ignore very grayish colors (where r ≈ g ≈ b)
-      const maxDiff = Math.max(Math.abs(r - g), Math.abs(r - b), Math.abs(g - b));
-      if (maxDiff > 20) {
-        return color; // found a colorful one
-      }
+        // Ignore very bright (white-ish) and very dark (black-ish) colors
+        if (brightness > 40 && brightness < 220) {
+            // Also ignore very grayish colors (where r ≈ g ≈ b)
+            const maxDiff = Math.max(Math.abs(r - g), Math.abs(r - b), Math.abs(g - b));
+            if (maxDiff > 20) {
+                return color; // found a colorful one
+            }
+        }
     }
-  }
-  // fallback: just pick the first one if nothing better
-  return palette[0];
+    // fallback: just pick the first one if nothing better
+    return palette[0];
 }
 
 function hexToRgb(hex) {
-  hex = hex.replace(/^#/, '');
-  if (hex.length === 3) {
-    hex = hex.split('').map(c => c + c).join('');
-  }
-  const num = parseInt(hex, 16);
-  return {
-    r: (num >> 16) & 255,
-    g: (num >> 8) & 255,
-    b: num & 255,
-  };
+    hex = hex.replace(/^#/, '');
+    if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+    }
+    const num = parseInt(hex, 16);
+    return {
+        r: (num >> 16) & 255,
+        g: (num >> 8) & 255,
+        b: num & 255,
+    };
 }
 
 function applyAccentColorToMask(selector, accentColor) {
-  const el = document.querySelector(selector);
-  if (!el) {
-    console.warn('Element not found:', selector);
-    return;
-  }
-  el.style.backgroundColor = accentColor;
+    const el = document.querySelector(selector);
+    if (!el) {
+        console.warn('Element not found:', selector);
+        return;
+    }
+    el.style.backgroundColor = accentColor;
 }
-
-// 🎧 WHEN SONG ENDS, AUTOPLAY NEXT
-Song.addEventListener("ended", nextSong);
-
-//format scripts, lockscreen?, ios, play pause button change on media keys, profiles, add more songsa

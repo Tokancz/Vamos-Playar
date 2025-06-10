@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("profileEmail").textContent = user.email;
   document.getElementById("profileStats").textContent = `
     Minutes listened: ${data.minutes_listened || 0}
-    Songs listened: ${data.songs_listened || 0}
+    Songs listened: ${data.songs_listened_to || 0}
     Top artist: ${data.top_artist || "N/A"}
   `;
 
