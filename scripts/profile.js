@@ -35,6 +35,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("logout").addEventListener("click", async () => {
     await supabase.auth.signOut();
-    window.location.href = "/auth.html";
+    window.location.href = "auth.html";
   });
 });
