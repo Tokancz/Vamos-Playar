@@ -106,7 +106,6 @@ section.profile {
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 20px;
   background-color: var(--accent);
   padding: 50px 0;
@@ -128,7 +127,7 @@ section.profile {
 
 .profile div {
   position: relative;
-  left: 80px;
+  left: 220px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -150,4 +149,14 @@ section.stats {
 #profileStats {
   text-align: left;
   line-height: 35px;
+}
+
+@media (width <= 768px) {
+  section.profile {flex-direction: column; padding: 20px 0 30px 0;}
+  .profile img {position: static;}
+  .profile div {position: static;}
+  .profile p {text-align: center;}
+  #profileStats {line-height: 25px;}
+  main {justify-content: start;}
+  section.profileCard {margin-top: 100px;}
 }
