@@ -16,7 +16,7 @@
 body {
   width: 100%;
   backdrop-filter: blur(15px) brightness(.3);
-  background-image: url("../images/VPLogoWithText.png");
+  background-image: url("../images/VPLogo.png");
   background-position: center;
   background-repeat: no-repeat;
   background-size: 100%;
