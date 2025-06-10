@@ -16,18 +16,22 @@ window.addEventListener("DOMContentLoaded", async () => {
   const form = document.getElementById("authForm");
   const toggleBtn = document.getElementById("toggleForm");
   const toggleText = document.getElementById("toggleText");
+  const toggleForm = document.getElementById("toggleForm");
   const submitBtn = document.getElementById("submitBtn");
   const title = document.getElementById("formTitle");
   const nameInput = form.querySelector('input[name="name"]');
   const avatarInput = form.querySelector('input[name="avatar"]');
 
-  let isLogin = false;
+  let isLogin = true;
 
   const updateFormUI = () => {
     submitBtn.textContent = isLogin ? "Log In" : "Sign Up";
     toggleText.textContent = isLogin
       ? "Don't have an account?"
       : "Already have an account?";
+    toggleForm.textContent = isLogin
+      ? "Switch to Sign up"
+      : "Switch to Login";
     title.textContent = isLogin ? "Log In" : "Sign Up";
 
     // Toggle visibility
