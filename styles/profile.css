@@ -160,6 +160,7 @@ section.stats {
   #profileStats {line-height: 25px;}
   main {justify-content: start;}
   section.profileCard {margin-top: 100px;}
+  #auth-container {margin-top: 130px;}
 }
 @media (width <= 425px) {
   *:not(text) {font-size: 1em;}
