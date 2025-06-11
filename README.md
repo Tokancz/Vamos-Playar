@@ -1,4 +1,6 @@
-Licences: - none
-This web page is for my personal purposses only, pls dont sue me
+** Licences: - none :3
+This web page is for my personal and educational purposses only, pls dont sue me
 
-i hate github ong
+Github im a good boy now, i swear
+
+todo: more profile stats, better song loading
