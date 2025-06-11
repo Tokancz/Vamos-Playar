@@ -53,7 +53,7 @@ section.searchbar {
     align-items: center;
     justify-content:space-between;
     border-radius: 10px;
-    padding: 0 20px;
+    padding: 0 10px;
     background-color: var(--backdrop);
     backdrop-filter: brightness(.1);
     border: var(--accent) 2px solid;
@@ -63,6 +63,7 @@ section.searchbar {
     border: none;
     outline: none;
     text-align: left;
+    overflow: hidden;
 }
 .searchbar input[type="text"]:focus {
     filter: brightness(1.5);
@@ -157,7 +158,7 @@ section.tab {
     position:sticky;
     top: 77vh;
     width: 95%;
-    height: 18%;
+    height: 150px;
     display: flex;
     justify-content: space-between;
     padding: 10px 20px 10px; 
@@ -231,10 +232,10 @@ section.SongCover {
 }
 section.yap {
     height: 100%;
-    width: 90%;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: end;
+    overflow: hidden;
 }
 h1 {
     font-size: 2em;
@@ -294,6 +295,7 @@ input[type="range"].volume-range::-webkit-slider-thumb {
 /* Default collapsed (tab) state */
 #tab.collapsed {
     width: 95%;
+    height: 150px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -312,8 +314,8 @@ input[type="range"].volume-range::-webkit-slider-thumb {
 }
 /* Expanded (tab open) state */
 #tab.expanded {
-    position: fixed;
-    bottom: 5%;
+    position: relative;
+    top: 76vh;
     width: 35%;
     flex-direction: row-reverse;
     justify-content: center;
@@ -378,6 +380,10 @@ section.slider.expanded {
     display: block;
 }
 
+@media (width <= 1024px) {
+    section.tab {height: 120px;}
+    input[type="range"].volume-range {height: 80px;}
+}
 @media (width <= 768px) {
     #tab.expanded {width: 45%;}
     section.songtab { gap: 10px; padding: 5px;}
@@ -389,8 +395,8 @@ section.slider.expanded {
     nav {padding: 0px;}
     section.searchbar {width: 200px;}
     i#user {padding: 10px;}
-    #tab.expanded {width: 80%; font-size: 1.5em;}
-    #songCover.collapsed {width: 95%;}
+    #tab.expanded {width: 80%; font-size: 1.5em; top: 73vh;}
+    #songCover.collapsed {width: 85%;}
     #tab.collapsed {width: 90%; gap: 10px; top: 82vh;}
     section.songList {top: -110px;}
     section.songtab {width: 90%; height: 100px;}
@@ -399,6 +405,7 @@ section.slider.expanded {
     p.songDuration {width: 15%;}
     section.volume {display: none;}
     section.detail {width: 10%; top:0;}
+    section.yap {font-size: 1.3em;}
     section.slider.collapsed {display: none;}
     #prevBtn.collapsed, #nextBtn.collapsed {display: none;}
 }
@@ -406,6 +413,7 @@ section.slider.expanded {
     *:not(text) { font-size: .95em; }
     body { background-size: 250%;}
     #tab.expanded {width: 80%;bottom: 15%;}
-    p#artists.collapsed {display: none;}
+    #tab.expanded {top: 70vh;}
+    #songCover.expanded {width: 90%;}
 }
 /*responzivita*/

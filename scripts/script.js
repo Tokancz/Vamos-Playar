@@ -268,6 +268,8 @@ function populateSongList(filter = "") {
     setDurations(); // Keep durations visible
 }
 
+let lastCountedTrackId = null;
+
 async function updateListeningStats(forceFinished = false) {
     if (playStartTime === null) return;
 
@@ -275,30 +277,33 @@ async function updateListeningStats(forceFinished = false) {
     accumulatedPlayTime += elapsedSeconds;
     playStartTime = null;
 
-    // Get current song info
     const song = songs[currentSong];
     const artist = song.artists;
-
-    // Update minutes listened
-    const minutesListened = Math.floor(accumulatedPlayTime / 60);
-    accumulatedPlayTime %= 60; // keep remainder
-
-    // Check if song qualifies as "listened"
     const songDuration = song.duration || 0;
-    const qualifiesAsListened = forceFinished || elapsedSeconds >= 30 || elapsedSeconds >= songDuration;
+    const trackId = song.id || song.title; // ✅ Fallback if no ID
+    const progress = song.currentTime || accumulatedPlayTime; // You may adjust this if your `song` has a currentTime field
+    const duration = songDuration;
 
-    // Get current user
-    const {
-        data: { user },
-        error: userError
-    } = await supabase.auth.getUser();
+    const qualifiesAsListened = 
+        (progress > 30 || progress > duration * 0.5) &&
+        trackId !== lastCountedTrackId;
 
+    // ✅ Avoid unnecessary work if nothing qualifies
+    const minutesListened = Math.floor(accumulatedPlayTime / 60);
+    accumulatedPlayTime %= 60;
+
+    if (!forceFinished && !qualifiesAsListened && minutesListened === 0) {
+        return;
+    }
+
+    // ✅ Get Supabase user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
         console.error("No user is logged in:", userError);
         return;
     }
 
-    // Fetch user profile
+    // ✅ Fetch user profile
     const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("minutes_listened, songs_listened_to, artist_counts")
@@ -310,19 +315,25 @@ async function updateListeningStats(forceFinished = false) {
         return;
     }
 
-    // Calculate updated stats
     const newMinutes = (profile.minutes_listened || 0) + minutesListened;
     const newSongs = qualifiesAsListened
         ? (profile.songs_listened_to || 0) + 1
         : (profile.songs_listened_to || 0);
 
-    // Update artist_counts object
     const artistCounts = profile.artist_counts || {};
+
+    // ✅ Add artist counts only if valid
     if (qualifiesAsListened) {
-        artistCounts[artist] = (artistCounts[artist] || 0) + 1;
+        lastCountedTrackId = trackId;
+
+        const individualArtists = artist.split("/").map(a => a.trim());
+
+        individualArtists.forEach(individualArtist => {
+            artistCounts[individualArtist] = (artistCounts[individualArtist] || 0) + 1;
+        });
     }
 
-    // Determine top artist
+    // ✅ Recalculate top artist
     let topArtist = "Unknown";
     let topCount = 0;
     for (const [a, count] of Object.entries(artistCounts)) {
@@ -332,7 +343,7 @@ async function updateListeningStats(forceFinished = false) {
         }
     }
 
-    // Update the profile in Supabase
+    // ✅ Update profile in Supabase
     const { error: updateError } = await supabase
         .from("profiles")
         .update({
@@ -346,7 +357,7 @@ async function updateListeningStats(forceFinished = false) {
     if (updateError) {
         console.error("Error updating profile stats:", updateError);
     } else {
-        console.log("Profile stats updated.");
+        console.log("✅ Profile stats updated.");
     }
 }
 
