@@ -36,6 +36,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     Times logged in: ${data.times_logged_in || 0}
   `;
 
+  // 🎨 Apply visual styling from top song
+  if (data.top_song_cover) {
+    const profileCard = document.querySelector(".profileCard");
+    profileCard.style.backgroundImage = `url('${data.top_song_cover}')`;
+    profileCard.style.backgroundSize = "cover";
+    profileCard.style.backgroundPosition = "center";
+    document.body.style.backgroundImage = `url('${data.top_song_cover}')`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backdropFilter = "blur(15px) brightness(0.15)";
+    document.body.style.transition = "background-image 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out";
+  }
+
+  if (data.top_song_accent) {
+    document.documentElement.style.setProperty('--accent', data.top_song_accent);
+  }
 
   document.getElementById("logout").addEventListener("click", async () => {
     await supabase.auth.signOut();

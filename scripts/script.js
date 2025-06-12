@@ -610,7 +610,7 @@ function triggerAnimation() {
 const colorThief = new ColorThief();
 const img = document.getElementById('coverImage');
 
-img.addEventListener('load', () => {
+img.addEventListener('load', async () => {
     console.log('Image loaded:', img.src);
     if (img.complete && img.naturalHeight !== 0) {
         const palette = colorThief.getPalette(img, 10);
@@ -621,6 +621,39 @@ img.addEventListener('load', () => {
         document.documentElement.style.setProperty('--accent', hexAccent);
         updateGradient();
         updateVolumeColor();
+
+        // ✅ Check if this song is the top song
+        const song = songs[currentSong];
+        const topSongTitle = song?.title;
+
+        // Get current user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError || !user) return;
+
+        const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("top_song")
+        .eq("id", user.id)
+        .single();
+
+        if (profileError || !profile) return;
+
+        if (profile.top_song === topSongTitle) {
+            // ✅ Update cover and accent in Supabase
+            const { error: updateError } = await supabase
+            .from("profiles")
+            .update({
+                top_song_cover: song.cover,
+                top_song_accent: hexAccent,
+            })
+            .eq("id", user.id);
+
+            if (updateError) {
+                console.error("Failed to save top song visual data:", updateError.message);
+            } else {
+                console.log("✅ Saved top song accent and cover to profile.");
+            }
+        }
     }
 });
 
