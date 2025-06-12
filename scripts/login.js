@@ -54,10 +54,39 @@ window.addEventListener("DOMContentLoaded", async () => {
     const avatar = avatarInput.value || null;
 
     if (isLogin) {
-      // Login flow
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return alert("Login failed: " + error.message);
+     // Login flow
+      const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
+      if (loginError) return alert("Login failed: " + loginError.message);
+
+      // ✅ Fetch logged-in user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        return alert("Login failed: couldn't retrieve user.");
+      }
+
+      // ✅ Get their profile
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("times_logged_in")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError) {
+        console.warn("Could not fetch profile to update login count:", profileError.message);
+      } else {
+        // ✅ Increment login count
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ times_logged_in: (profile.times_logged_in || 0) + 1 })
+          .eq("id", user.id);
+
+        if (updateError) {
+          console.warn("Failed to increment login count:", updateError.message);
+        }
+      }
+
       window.location.href = "profile.html";
+
     } else {
       // Signup flow
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({

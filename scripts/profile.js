@@ -30,8 +30,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("profileStats").textContent = `
     Minutes listened: ${data.minutes_listened || 0}
     Songs listened: ${data.songs_listened_to || 0}
+    Unique songs: ${data.unique_songs_listened || 0}
     Top artist: ${data.top_artist || "N/A"}
+    Top song: ${data.top_song || "N/A"}
+    Times logged in: ${data.times_logged_in || 0}
   `;
+
 
   document.getElementById("logout").addEventListener("click", async () => {
     await supabase.auth.signOut();

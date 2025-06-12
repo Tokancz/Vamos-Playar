@@ -306,7 +306,7 @@ async function updateListeningStats(forceFinished = false) {
     // ✅ Fetch user profile
     const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("minutes_listened, songs_listened_to, artist_counts")
+        .select("minutes_listened, songs_listened_to, artist_counts, song_counts, top_song, unique_songs_listened, first_listen_at")
         .eq("id", user.id)
         .single();
 
@@ -315,44 +315,66 @@ async function updateListeningStats(forceFinished = false) {
         return;
     }
 
+    const artistCounts = profile.artist_counts || {};
+    const songCounts = profile.song_counts || {};
+    const uniqueSongs = Object.keys(songCounts).length;
     const newMinutes = (profile.minutes_listened || 0) + minutesListened;
     const newSongs = qualifiesAsListened
         ? (profile.songs_listened_to || 0) + 1
         : (profile.songs_listened_to || 0);
 
-    const artistCounts = profile.artist_counts || {};
-
     // ✅ Add artist counts only if valid
     if (qualifiesAsListened) {
         lastCountedTrackId = trackId;
 
+        // Update artist counts
         const individualArtists = artist.split("/").map(a => a.trim());
-
         individualArtists.forEach(individualArtist => {
             artistCounts[individualArtist] = (artistCounts[individualArtist] || 0) + 1;
         });
+
+        // Update song counts
+        const songTitle = song.title;
+        songCounts[songTitle] = (songCounts[songTitle] || 0) + 1;
     }
 
-    // ✅ Recalculate top artist
     let topArtist = "Unknown";
-    let topCount = 0;
+    let topArtistCount = 0;
     for (const [a, count] of Object.entries(artistCounts)) {
-        if (count > topCount) {
+        if (count > topArtistCount) {
             topArtist = a;
-            topCount = count;
+            topArtistCount = count;
         }
     }
 
+    let topSong = "Unknown";
+    let topSongCount = 0;
+    for (const [title, count] of Object.entries(songCounts)) {
+        if (count > topSongCount) {
+            topSong = title;
+            topSongCount = count;
+        }
+    }
+
+    const now = new Date().toISOString();
+    const firstListen = profile.first_listen_at || now;
+    const lastListen = now;
+
     // ✅ Update profile in Supabase
     const { error: updateError } = await supabase
-        .from("profiles")
-        .update({
-            minutes_listened: newMinutes,
-            songs_listened_to: newSongs,
-            artist_counts: artistCounts,
-            top_artist: topArtist
-        })
-        .eq("id", user.id);
+    .from("profiles")
+    .update({
+        minutes_listened: newMinutes,
+        songs_listened_to: newSongs,
+        artist_counts: artistCounts,
+        top_artist: topArtist,
+        song_counts: songCounts,
+        top_song: topSong,
+        unique_songs_listened: uniqueSongs,
+        first_listen_at: firstListen,
+        last_listen_at: lastListen,
+    })
+    .eq("id", user.id);
 
     if (updateError) {
         console.error("Error updating profile stats:", updateError);
