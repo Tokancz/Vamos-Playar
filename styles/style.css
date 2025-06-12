@@ -214,18 +214,22 @@ section.icons {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+    gap: 50px;
 }
 section.icons div {
-    width: 200px;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+    gap: 20px;
+}
+section.icons div.playIcons {
+    width: 200px;
 }
 section.icons i {
     font-size: 1.8em;
     transition: .3s;
 }
-i#shuffleBtn.active {
+i.active {
     color: var(--accent);
 }
 i#pause, i#play {

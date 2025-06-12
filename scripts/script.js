@@ -59,6 +59,7 @@ const accent = getComputedStyle(document.documentElement).getPropertyValue('--ac
 const BG = document.body;
 const cross = document.getElementById("X");
 const shuffleBtn = document.getElementById("shuffleBtn");
+const repeatBtn = document.getElementById("repeatBtn");
 
 function setup() {
     updateMusic();
@@ -126,11 +127,30 @@ function setup() {
     // Restore saved shuffle state
     shuffle = localStorage.getItem("shuffle") === "true";
     updateShuffleUI();
+     // Restore saved repeat state
+    repeat = localStorage.getItem("repeat") === "true";
+    updateRepeatUI();
 
     shuffleBtn.addEventListener("click", () => {
         shuffle = !shuffle;
+        if (shuffle) {
+            repeat = false;  // turn off repeat if shuffle turns on
+            localStorage.setItem("repeat", repeat);
+            updateRepeatUI();
+        }
         localStorage.setItem("shuffle", shuffle);
         updateShuffleUI();
+    });
+
+    repeatBtn.addEventListener("click", () => {
+        repeat = !repeat;
+        if (repeat) {
+            shuffle = false;  // turn off shuffle if repeat turns on
+            localStorage.setItem("shuffle", shuffle);
+            updateShuffleUI();
+        }
+        localStorage.setItem("repeat", repeat);
+        updateRepeatUI();
     });
 
     if ('mediaSession' in navigator) {
@@ -528,8 +548,15 @@ function loadSong(index, autoplay = false) {
 
 // ⏩ NEXT SONG
 let shuffle = false;
+let repeat = false;  // false means no repeat; true means repeat one
 
 function nextSong() {
+    if (repeat) {
+        // If repeat is ON, do NOT change currentSong, just reload it.
+        loadSong(currentSong, true);
+        return; // exit early so no other logic runs
+    }
+
     if (shuffle) {
         let next;
         do {
@@ -551,6 +578,14 @@ function prevSong() {
 function updateShuffleUI() {
     const btn = document.getElementById("shuffleBtn");
     if (shuffle) {
+        btn.classList.add("active");
+    } else {
+        btn.classList.remove("active");
+    }
+}
+function updateRepeatUI() {
+    const btn = document.getElementById("repeatBtn");
+    if (repeat) {
         btn.classList.add("active");
     } else {
         btn.classList.remove("active");
