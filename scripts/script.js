@@ -44,8 +44,8 @@ let songTracked = false;
 
 const play_btn = document.getElementById("play");
 const pause_btn = document.getElementById("pause");
-const next_btn = document.getElementById("nextBtn");
-const prev_btn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
 const unmute_btn = document.getElementById("unmuted");
 const mute_btn = document.getElementById("muted");
 const cur_time = document.getElementById("cur_time");
@@ -71,8 +71,8 @@ function setup() {
 
     play_btn.addEventListener('pointerdown', togglePlayPause);
     pause_btn.addEventListener('pointerdown', togglePlayPause);
-    next_btn.addEventListener("pointerdown", nextSong);
-    prev_btn.addEventListener("pointerdown", prevSong);
+    nextBtn.addEventListener("pointerdown", nextSong);
+    prevBtn.addEventListener("pointerdown", prevSong);
     mute_btn.addEventListener("pointerdown", toggleMute);
     unmute_btn.addEventListener("pointerdown", toggleMute);
     slider.addEventListener("input", updateGradient);
@@ -179,11 +179,10 @@ function toggleTab() {
     const sList = document.getElementById("songList");
     const song = document.getElementById("songCover");
     const detail = document.getElementById("detail");
+    const icons = document.getElementById("icons");
     const yap = document.getElementById("yap");
     const volume = document.querySelector("section.volume");
     const sliderSection = document.querySelector("section.slider");
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
 
     if (!tabOpen) {
         // OPEN TAB
@@ -195,17 +194,23 @@ function toggleTab() {
         tab.classList.remove("collapsed");
         song.classList.remove("collapsed");
         volume.classList.remove("collapsed");
+        icons.classList.remove("collapsed");
         sliderSection.classList.remove("collapsed");
         prevBtn.classList.remove("collapsed");
         nextBtn.classList.remove("collapsed");
+        shuffleBtn.classList.remove("collapsed");
+        repeatBtn.classList.remove("collapsed");
         artists.classList.remove("collapsed");
 
         tab.classList.add("expanded");
         song.classList.add("expanded");
         volume.classList.add("expanded");
+        icons.classList.add("expanded");
         sliderSection.classList.add("expanded");
         prevBtn.classList.add("expanded");
         nextBtn.classList.add("expanded");
+        shuffleBtn.classList.add("expanded");
+        repeatBtn.classList.add("expanded");
         artists.classList.add("expanded");
 
         coverImage.style.width = "100%";
@@ -229,17 +234,23 @@ function toggleTab() {
         tab.classList.remove("expanded");
         song.classList.remove("expanded");
         volume.classList.remove("expanded");
+        icons.classList.remove("expanded");
         sliderSection.classList.remove("expanded");
         prevBtn.classList.remove("expanded");
         nextBtn.classList.remove("expanded");
+        shuffleBtn.classList.remove("expanded");
+        repeatBtn.classList.remove("expanded");
         artists.classList.remove("expanded");
 
         tab.classList.add("collapsed");
         song.classList.add("collapsed");
         volume.classList.add("collapsed");
+        icons.classList.add("collapsed");
         sliderSection.classList.add("collapsed");
         prevBtn.classList.add("collapsed");
         nextBtn.classList.add("collapsed");
+        shuffleBtn.classList.add("collapsed");
+        repeatBtn.classList.add("collapsed");
         artists.classList.add("collapsed");
 
         coverImage.style = "";

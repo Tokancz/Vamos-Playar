@@ -329,7 +329,7 @@ input[type="range"].volume-range::-webkit-slider-thumb {
 #tab.expanded {
     position: relative;
     top: 76vh;
-    width: 35%;
+    width: 45%;
     flex-direction: row-reverse;
     justify-content: center;
     align-items: center;
@@ -347,6 +347,10 @@ input[type="range"].volume-range::-webkit-slider-thumb {
     align-items: center;
 }
 
+section.icons.expanded {
+    width: 300px;
+}
+
 /* 🎚️ Slider */
 section.slider.collapsed {
     display: none;
@@ -358,11 +362,15 @@ section.slider.expanded {
     gap: 10px;
 }
 #prevBtn.collapsed,
-#nextBtn.collapsed {
-    display: none;
+#nextBtn.collapsed,
+#shuffleBtn.collapsed,
+#repeatBtn.collapsed {
+    display: block;
 }
 #prevBtn.expanded,
-#nextBtn.expanded {
+#nextBtn.expanded,
+#shuffleBtn.expanded,
+#repeatBtn.expanded {
     display: block;
 }
 
@@ -378,29 +386,15 @@ section.slider.expanded {
 }
 
 /* ⏮️⏭️ Prev / Next Buttons */
-#prevBtn.collapsed,
-#nextBtn.collapsed {
-    display: block;
-}
-#prevBtn.expanded,
-#nextBtn.expanded {
-    display: block;
-}
-#artists.collapsed {
-    display: block;
-}
-#artists.expanded {
-    display: block;
-}
 
 @media (width <= 1024px) {
     section.tab {height: 120px;}
     input[type="range"].volume-range {height: 80px;}
 }
 @media (width <= 768px) {
-    #tab.expanded {width: 45%;}
     section.songtab { gap: 10px; padding: 5px;}
     #tab.collapsed {height: 10%; padding: 10px;}
+    section.icons {width: 300px;}
 }
 @media (width <= 425px) {
     *:not(text) { font-size: .98em; }
@@ -420,7 +414,16 @@ section.slider.expanded {
     section.detail {width: 10%; top:0;}
     section.yap {font-size: 1.3em;}
     section.slider.collapsed {display: none;}
-    #prevBtn.collapsed, #nextBtn.collapsed {display: none;}
+    section.icons.expanded {width: auto; font-size: .8em;}
+    section.icons {width: 20px;}
+    section.icons div.playIcons{width: auto;}
+    #prevBtn.collapsed,
+    #nextBtn.collapsed,
+    #shuffleBtn.collapsed,
+    #repeatBtn.collapsed {
+        display: none;
+    }
+    
 }
 @media (width <= 320px) {
     *:not(text) { font-size: .95em; }
