@@ -58,6 +58,7 @@ const coverImage = document.getElementById("coverImage");
 const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
 const BG = document.body;
 const cross = document.getElementById("X");
+const shuffleBtn = document.getElementById("shuffleBtn");
 
 function setup() {
     updateMusic();
@@ -122,6 +123,15 @@ function setup() {
         }
     });
 
+    // Restore saved shuffle state
+    shuffle = localStorage.getItem("shuffle") === "true";
+    updateShuffleUI();
+
+    shuffleBtn.addEventListener("click", () => {
+        shuffle = !shuffle;
+        localStorage.setItem("shuffle", shuffle);
+        updateShuffleUI();
+    });
 
     if ('mediaSession' in navigator) {
         navigator.mediaSession.setActionHandler('play', () => {
@@ -517,7 +527,7 @@ function loadSong(index, autoplay = false) {
 }
 
 // ⏩ NEXT SONG
-let shuffle = false; //need to add html
+let shuffle = false;
 
 function nextSong() {
     if (shuffle) {
@@ -536,6 +546,15 @@ function nextSong() {
 function prevSong() {
     currentSong = (currentSong - 1 + songs.length) % songs.length;
     loadSong(currentSong, true); // always autoplay after skipping
+}
+
+function updateShuffleUI() {
+    const btn = document.getElementById("shuffleBtn");
+    if (shuffle) {
+        btn.classList.add("active");
+    } else {
+        btn.classList.remove("active");
+    }
 }
 
 function toggleMute() {

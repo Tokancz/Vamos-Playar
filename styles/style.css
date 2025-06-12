@@ -210,6 +210,12 @@ section.slider {
     gap: 10px;
 }
 section.icons {
+    width: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+section.icons div {
     width: 200px;
     display: flex;
     align-items: center;
@@ -218,6 +224,9 @@ section.icons {
 section.icons i {
     font-size: 1.8em;
     transition: .3s;
+}
+i#shuffleBtn.active {
+    color: var(--accent);
 }
 i#pause, i#play {
     font-size: 2.5em;
