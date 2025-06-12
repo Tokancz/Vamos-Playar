@@ -284,7 +284,7 @@ async function updateListeningStats(forceFinished = false) {
     const progress = song.currentTime || accumulatedPlayTime; // You may adjust this if your `song` has a currentTime field
     const duration = songDuration;
 
-    const qualifiesAsListened = 
+    const qualifiesAsListened =
         (progress > 30 || progress > duration * 0.5) &&
         trackId !== lastCountedTrackId;
 
@@ -361,9 +361,7 @@ async function updateListeningStats(forceFinished = false) {
     const lastListen = now;
 
     // ✅ Update profile in Supabase
-    const { error: updateError } = await supabase
-    .from("profiles")
-    .update({
+    const updates = {
         minutes_listened: newMinutes,
         songs_listened_to: newSongs,
         artist_counts: artistCounts,
@@ -373,13 +371,66 @@ async function updateListeningStats(forceFinished = false) {
         unique_songs_listened: uniqueSongs,
         first_listen_at: firstListen,
         last_listen_at: lastListen,
-    })
-    .eq("id", user.id);
+    };
 
-    if (updateError) {
-        console.error("Error updating profile stats:", updateError);
+    // Check if the top song has changed
+    if (profile.top_song !== topSong) {
+        const topSongData = songs.find(s => s.title === topSong);
+        const cover = topSongData?.cover;
+
+        if (cover) {
+            try {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.src = cover;
+
+                img.onload = async () => {
+                    const palette = colorThief.getPalette(img, 10);
+                    const vibrant = pickVibrantColor(palette);
+                    const hexAccent = rgbToHex(...vibrant);
+
+                    updates.top_song_cover = cover;
+                    updates.top_song_accent = hexAccent;
+
+                    const { error: updateError } = await supabase
+                        .from("profiles")
+                        .update(updates)
+                        .eq("id", user.id);
+
+                    if (updateError) {
+                        console.error("Error updating profile with top song cover/accent:", updateError);
+                    } else {
+                        console.log("✅ Profile + top song visual updated.");
+                    }
+                };
+            } catch (err) {
+                console.error("Error loading image for color extraction:", err);
+            }
+        } else {
+            // No cover found — just update text stats
+            const { error: updateError } = await supabase
+                .from("profiles")
+                .update(updates)
+                .eq("id", user.id);
+
+            if (updateError) {
+                console.error("Error updating profile stats:", updateError);
+            } else {
+                console.log("✅ Profile stats updated (no cover).");
+            }
+        }
     } else {
-        console.log("✅ Profile stats updated.");
+        // Top song hasn't changed — update regular stats only
+        const { error: updateError } = await supabase
+            .from("profiles")
+            .update(updates)
+            .eq("id", user.id);
+
+        if (updateError) {
+            console.error("Error updating profile stats:", updateError);
+        } else {
+            console.log("✅ Profile stats updated.");
+        }
     }
 }
 
@@ -621,39 +672,6 @@ img.addEventListener('load', async () => {
         document.documentElement.style.setProperty('--accent', hexAccent);
         updateGradient();
         updateVolumeColor();
-
-        // ✅ Check if this song is the top song
-        const song = songs[currentSong];
-        const topSongTitle = song?.title;
-
-        // Get current user
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError || !user) return;
-
-        const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("top_song")
-        .eq("id", user.id)
-        .single();
-
-        if (profileError || !profile) return;
-
-        if (profile.top_song === topSongTitle) {
-            // ✅ Update cover and accent in Supabase
-            const { error: updateError } = await supabase
-            .from("profiles")
-            .update({
-                top_song_cover: song.cover,
-                top_song_accent: hexAccent,
-            })
-            .eq("id", user.id);
-
-            if (updateError) {
-                console.error("Failed to save top song visual data:", updateError.message);
-            } else {
-                console.log("✅ Saved top song accent and cover to profile.");
-            }
-        }
     }
 });
 
