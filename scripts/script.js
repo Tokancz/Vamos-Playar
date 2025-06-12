@@ -116,9 +116,9 @@ function setup() {
     document.getElementById("user").addEventListener("pointerdown", async () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-            window.location.href = "/profile.html";
+            window.location.href = "profile.html";
         } else {
-            window.location.href = "/auth.html";
+            window.location.href = "auth.html";
         }
     });
 
