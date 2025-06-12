@@ -121,6 +121,7 @@ section.profile {
 .profile img {
   position: absolute;
   width: 180px;
+  height: 180px;
   left: 20px;
   top: 20px;
   border-radius: 50px;

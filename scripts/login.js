@@ -4,15 +4,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtYmxrcWdlYWFlenR0aWtweHhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzY3MzMsImV4cCI6MjA2NDUxMjczM30.4TRpAxHihyPQnvuaMOZP5DnGre2OLYu9YQJIn2cXsrE'
   );
 
-  // Check if user already logged in
-  const { data: { session } } = await supabase.auth.getSession();
-
-  if (session) {
-    // User logged in — redirect to profile page
-    window.location.href = "profile.html";
-    return; // Stop running the rest of the login script
-  }
-
   const form = document.getElementById("authForm");
   const toggleBtn = document.getElementById("toggleForm");
   const toggleText = document.getElementById("toggleText");
