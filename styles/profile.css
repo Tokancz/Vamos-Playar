@@ -176,4 +176,5 @@ section.stats {
 }
 @media (width <= 425px) {
   *:not(text) {font-size: 1em;}
+  body {background-repeat: repeat-y;}
 }
