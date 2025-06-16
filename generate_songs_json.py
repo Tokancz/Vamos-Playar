@@ -52,10 +52,18 @@ for filename in os.listdir(SONGS_DIR):
         # No cover art found - optional: assign default cover image path
         cover_path = "./covers/default.jpg"
 
+    """ 
     song_data = {
         "title": title,
         "artists": artist,
         "file": f"./{SONGS_DIR}/{filename}",
+        "cover": cover_path
+    }
+    """
+    song_data = {
+        "title": title,
+        "artists": artist,
+        "file": filename,
         "cover": cover_path
     }
     songs.append(song_data)
