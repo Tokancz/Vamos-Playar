@@ -249,6 +249,7 @@ section.SongCover {
 }
 section.yap {
     height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: end;
@@ -344,7 +345,7 @@ input[type="range"].volume-range::-webkit-slider-thumb {
     left: 50%;
     top: 40%;
     transform: translate(-50%, -50%);
-    width: 80%;
+    width: 75%;
     max-width: 400px;
     height: auto;
     flex-direction: column-reverse;
@@ -410,7 +411,7 @@ section.slider.expanded {
 @media (width <= 768px) {
     section.songtab { gap: 10px; padding: 5px;}
     #tab.collapsed {height: 10%; padding: 10px;}
-    section.icons {width: 300px;}
+    section.icons {width: 300px; gap: 10px;}
     #visualizer.collapsed {display: none;}
     #visualizer.expanded {width: 100%; top: 10%; height: 200px;}
 }
@@ -448,6 +449,6 @@ section.slider.expanded {
     body { background-size: 250%;}
     #tab.expanded {width: 80%;bottom: 15%;}
     #tab.expanded {top: 70svh;}
-    #songCover.expanded {width: 90%;}
+    #songCover.expanded {width: 80%;}
 }
 /*responzivita*/
