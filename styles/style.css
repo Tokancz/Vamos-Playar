@@ -390,9 +390,15 @@ section.slider.expanded {
 }
 #visualizer {
     margin-top: 10px;
-    height: 120px;
+    height: 80px;
     background: transparent;
     width: 30%;
+}
+#visualizer.expanded {
+    position: fixed;
+    top: 15%;
+    width: 80%;
+    height: 300px;
 }
 
 /* ⏮️⏭️ Prev / Next Buttons */
@@ -405,7 +411,8 @@ section.slider.expanded {
     section.songtab { gap: 10px; padding: 5px;}
     #tab.collapsed {height: 10%; padding: 10px;}
     section.icons {width: 300px;}
-    #visualizer {display: none;}
+    #visualizer.collapsed {display: none;}
+    #visualizer.expanded {width: 100%; top: 10%; height: 200px;}
 }
 @media (width <= 425px) {
     *:not(text) { font-size: .98em; }

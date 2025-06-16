@@ -181,6 +181,7 @@ function toggleTab() {
     const detail = document.getElementById("detail");
     const icons = document.getElementById("icons");
     const yap = document.getElementById("yap");
+    const visualizer = document.getElementById("visualizer");
     const volume = document.querySelector("section.volume");
     const sliderSection = document.querySelector("section.slider");
 
@@ -201,6 +202,7 @@ function toggleTab() {
         shuffleBtn.classList.remove("collapsed");
         repeatBtn.classList.remove("collapsed");
         artists.classList.remove("collapsed");
+        visualizer.classList.remove("collapsed");
 
         tab.classList.add("expanded");
         song.classList.add("expanded");
@@ -212,6 +214,7 @@ function toggleTab() {
         shuffleBtn.classList.add("expanded");
         repeatBtn.classList.add("expanded");
         artists.classList.add("expanded");
+        visualizer.classList.add("expanded");
 
         coverImage.style.width = "100%";
         coverImage.style.height = "100%";
@@ -241,6 +244,7 @@ function toggleTab() {
         shuffleBtn.classList.remove("expanded");
         repeatBtn.classList.remove("expanded");
         artists.classList.remove("expanded");
+        visualizer.classList.remove("expanded");
 
         tab.classList.add("collapsed");
         song.classList.add("collapsed");
@@ -252,6 +256,7 @@ function toggleTab() {
         shuffleBtn.classList.add("collapsed");
         repeatBtn.classList.add("collapsed");
         artists.classList.add("collapsed");
+        visualizer.classList.add("collapsed");
 
         coverImage.style = "";
         artists.style.textAlign = "";
@@ -795,7 +800,7 @@ const visualizer = document.getElementById('visualizer');
 const numBarsPerSide = 24; // total bars = 48
 const bars = [];
 let lastHeights = [];
-const maxBarHeight = 50;
+const maxBarHeight = 100;
 let visualizerInitialized = false;
 
 let audioCtx, analyser, source, dataArray;
@@ -840,28 +845,17 @@ function animateVisualizer() {
     requestAnimationFrame(animateVisualizer);
     analyser.getByteFrequencyData(dataArray);
 
-    for (let i = 0; i < numBarsPerSide; i++) {
-        // left side is still flipped (from center outwards low->high)
-        const leftValue = dataArray[numBarsPerSide - 1 - i] ?? 0;
+    for (let i = 0; i < numBarsPerSide * 2; i++) {
+        const value = dataArray[Math.abs(numBarsPerSide - 1 - i)] ?? 0;
+        const targetHeight = (value / 255) * maxBarHeight;
 
-        // right side flipped so it goes high -> low (near center to edge)
-        const rightValue = dataArray[numBarsPerSide - 1 - i] ?? 0; // flip data for right side as well
+        const currentHeight = lastHeights[i];
+        const easingFactor = 0.1 + (currentHeight / maxBarHeight) * 0.4; // range: 0.1 to 0.5
+        const eased = currentHeight + (targetHeight - currentHeight) * easingFactor;
 
-        const leftHeight = (leftValue / 255) * maxBarHeight;
-        const rightHeight = (rightValue / 255) * maxBarHeight;
+        lastHeights[i] = eased;
 
-        const easedLeft = lastHeights[i] + (leftHeight - lastHeights[i]) * 0.3;
-        const easedRight = lastHeights[numBarsPerSide + i] + (rightHeight - lastHeights[numBarsPerSide + i]) * 0.3;
-
-        lastHeights[i] = easedLeft;
-        lastHeights[numBarsPerSide + i] = easedRight;
-
-        // Left bar (flipped)
-        bars[i].setAttribute('y', `${50 - easedLeft}`);
-        bars[i].setAttribute('height', `${easedLeft * 2}`);
-
-        // Right bar (flipped horizontally for < > shape)
-        bars[numBarsPerSide * 2 - 1 - i].setAttribute('y', `${50 - easedRight}`);
-        bars[numBarsPerSide * 2 - 1 - i].setAttribute('height', `${easedRight * 2}`);
+        bars[i].setAttribute('y', `${100 - eased}`);
+        bars[i].setAttribute('height', `${eased}`);
     }
 }
