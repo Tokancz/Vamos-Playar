@@ -6,57 +6,27 @@ const supabase = window.supabase.createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtYmxrcWdlYWFlenR0aWtweHhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzY3MzMsImV4cCI6MjA2NDUxMjczM30.4TRpAxHihyPQnvuaMOZP5DnGre2OLYu9YQJIn2cXsrE'
 );
 
-// No need to list files if bucket is private and no policy allows listing
-(async () => {
-  // Remove this list call:
-  // const { data, error } = await supabase.storage.from('songs').list('', { limit: 100 });
-  // if (error) {
-  //   console.error("❌ Error listing bucket files:", error);
-  // } else {
-  //   console.log("📦 FILES IN BUCKET:", data);
-  // }
-
-  fetch('./songs.json')
+fetch('./songs.json')
     .then(res => res.json())
-    .then(async (data) => {
-      console.log("Loaded metadata:", data);
-
-      const updatedSongs = await Promise.all(data.map(async (song) => {
-        const { data: signed, error } = await supabase.storage
-          .from('songs')
-          .createSignedUrl(song.file, 60 * 60);
-
-        if (error || !signed) {
-          console.error(`❌ Failed to generate signed URL for ${song.file}`, error);
-          return null;
+    .then(data => {
+        console.log("Loaded songs:", data);
+        songs = data;
+        if (songs.length > 0) {
+            populateSongList();
+            // 👇 Try to restore last played song
+            const savedSongIndex = parseInt(localStorage.getItem("currentSong"));
+            if (!isNaN(savedSongIndex) && savedSongIndex >= 0 && savedSongIndex < songs.length) {
+                currentSong = savedSongIndex;
+            } else {
+                currentSong = 0;
+            }
+            loadSong(currentSong, false);
+            setup();
+        } else {
+            console.error("No songs found in songs.json");
         }
-
-        console.log(`✅ Signed URL for ${song.title}:`, signed.signedUrl);
-
-        return {
-          ...song,
-          file: signed.signedUrl,
-        };
-      }));
-
-      songs = updatedSongs.filter(Boolean);
-
-      if (songs.length > 0) {
-        populateSongList();
-        const savedSongIndex = parseInt(localStorage.getItem("currentSong"));
-        currentSong = (!isNaN(savedSongIndex) && savedSongIndex >= 0 && savedSongIndex < songs.length)
-          ? savedSongIndex
-          : 0;
-
-        loadSong(currentSong, false);
-        setup();
-      } else {
-        console.error("❌ No valid songs loaded. Check filenames and bucket name.");
-      }
     })
-    .catch(err => console.error("Failed to load songs:", err));
-})();
-
+    .catch(err => console.error("Failed to load songs:", err))
 
 
 // 🔥 SETUP
