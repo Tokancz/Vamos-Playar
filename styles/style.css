@@ -156,7 +156,7 @@ p.songDuration {
 }
 section.tab {
     position:sticky;
-    top: 77svh;
+    top: 77dvh;
     width: 95%;
     height: 150px;
     display: flex;
@@ -404,7 +404,7 @@ section.slider.expanded {
     i#user {padding: 10px;}
     #tab.expanded {width: 80%; font-size: 1.5em; top: 73svh;}
     #songCover.collapsed {width: 85%;}
-    #tab.collapsed {width: 90%; gap: 10px; top: 82svh;}
+    #tab.collapsed {width: 90%; gap: 10px; top: 82dvh;}
     section.songList {top: -110px;}
     section.songtab {width: 90%; height: 100px;}
     img.album_cover {height: 100px;}
