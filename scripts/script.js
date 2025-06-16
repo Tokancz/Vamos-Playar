@@ -520,6 +520,10 @@ function loadSong(index, autoplay = false) {
 
     const track = songs[index];
     Song.src = track.file;
+
+    if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+        initVisualizer();
+
     Song.load();
     songTitle.textContent = track.title;
     artists.textContent = track.artists;
@@ -784,4 +788,80 @@ function applyAccentColorToMask(selector, accentColor) {
         return;
     }
     el.style.backgroundColor = accentColor;
+}
+
+// === 🎧 VISUALIZER ===
+const visualizer = document.getElementById('visualizer');
+const numBarsPerSide = 24; // total bars = 48
+const bars = [];
+let lastHeights = [];
+const maxBarHeight = 50;
+let visualizerInitialized = false;
+
+let audioCtx, analyser, source, dataArray;
+
+function initVisualizer() {
+    if (visualizerInitialized) return;
+    visualizerInitialized = true;
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 128;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        source = audioCtx.createMediaElementSource(Song);
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+    }
+
+    visualizer.innerHTML = '';
+    bars.length = 0;
+    lastHeights.length = 0;
+
+    const totalBars = numBarsPerSide * 2;
+
+    for (let i = 0; i < totalBars; i++) {
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', (i * (100 / totalBars)).toString());
+        rect.setAttribute('width', (100 / totalBars - 1).toString());
+        rect.setAttribute('y', '50');
+        rect.setAttribute('height', '0');
+        rect.setAttribute('fill', 'var(--accent)');
+        rect.setAttribute('rx', '1.5');
+        rect.setAttribute('ry', '1.5');
+        bars.push(rect);
+        lastHeights.push(0);
+        visualizer.appendChild(rect);
+    }
+
+    animateVisualizer();
+}
+
+function animateVisualizer() {
+    requestAnimationFrame(animateVisualizer);
+    analyser.getByteFrequencyData(dataArray);
+
+    for (let i = 0; i < numBarsPerSide; i++) {
+        // left side is still flipped (from center outwards low->high)
+        const leftValue = dataArray[numBarsPerSide - 1 - i] ?? 0;
+
+        // right side flipped so it goes high -> low (near center to edge)
+        const rightValue = dataArray[numBarsPerSide - 1 - i] ?? 0; // flip data for right side as well
+
+        const leftHeight = (leftValue / 255) * maxBarHeight;
+        const rightHeight = (rightValue / 255) * maxBarHeight;
+
+        const easedLeft = lastHeights[i] + (leftHeight - lastHeights[i]) * 0.3;
+        const easedRight = lastHeights[numBarsPerSide + i] + (rightHeight - lastHeights[numBarsPerSide + i]) * 0.3;
+
+        lastHeights[i] = easedLeft;
+        lastHeights[numBarsPerSide + i] = easedRight;
+
+        // Left bar (flipped)
+        bars[i].setAttribute('y', `${50 - easedLeft}`);
+        bars[i].setAttribute('height', `${easedLeft * 2}`);
+
+        // Right bar (flipped horizontally for < > shape)
+        bars[numBarsPerSide * 2 - 1 - i].setAttribute('y', `${50 - easedRight}`);
+        bars[numBarsPerSide * 2 - 1 - i].setAttribute('height', `${easedRight * 2}`);
+    }
 }

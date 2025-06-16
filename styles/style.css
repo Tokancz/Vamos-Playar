@@ -388,6 +388,12 @@ section.slider.expanded {
     align-items: center;
     gap: 10px;
 }
+#visualizer {
+    margin-top: 10px;
+    height: 120px;
+    background: transparent;
+    width: 30%;
+}
 
 /* ⏮️⏭️ Prev / Next Buttons */
 
@@ -399,6 +405,7 @@ section.slider.expanded {
     section.songtab { gap: 10px; padding: 5px;}
     #tab.collapsed {height: 10%; padding: 10px;}
     section.icons {width: 300px;}
+    #visualizer {display: none;}
 }
 @media (width <= 425px) {
     *:not(text) { font-size: .98em; }
