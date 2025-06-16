@@ -6,6 +6,18 @@
     "cover": "./covers/Untouched.jpg"
   },
   {
+    "title": "MONEY ON THE DASH - SPED UP",
+    "artists": "Elley Duhé/Whethan",
+    "file": "MONEY ON THE DASH - SPED UP - Elley Duhé.mp3",
+    "cover": "./covers/MONEY ON THE DASH - SPED UP.jpg"
+  },
+  {
+    "title": "Слушать!",
+    "artists": "EMPTY",
+    "file": "Слушать! - EMPTY.mp3",
+    "cover": "./covers/Слушать_.jpg"
+  },
+  {
     "title": "YUM YUM",
     "artists": "LXNGVX/Mc Gw",
     "file": "YUM YUM - LXNGVX.mp3",
@@ -36,6 +48,24 @@
     "cover": "./covers/Copy.jpg"
   },
   {
+    "title": "каждый кто делал тебе больно",
+    "artists": "cenker/Akucum/Lieless",
+    "file": "каждый кто делал тебе больно - cenker.mp3",
+    "cover": "./covers/каждый кто делал тебе больно.jpg"
+  },
+  {
+    "title": "Я НЕ ХОЧУ!",
+    "artists": "Flerian/Lieless/AGONY",
+    "file": "Я НЕ ХОЧУ! - Flerian.mp3",
+    "cover": "./covers/Я НЕ ХОЧУ_.jpg"
+  },
+  {
+    "title": "Ева",
+    "artists": "Asentrix",
+    "file": "Ева - Asentrix.mp3",
+    "cover": "./covers/Ева.jpg"
+  },
+  {
     "title": "I Will Not Spaceglide in Class",
     "artists": "Silencee",
     "file": "I Will Not Spaceglide in Class - Silencee.mp3",
@@ -58,6 +88,12 @@
     "artists": "Velvet Horizon",
     "file": "Take it Off - Sped Up - Velvet Horizon.mp3",
     "cover": "./covers/Take it Off - Sped Up.jpg"
+  },
+  {
+    "title": "Лисёнок",
+    "artists": "hornja",
+    "file": "Лисёнок - hornja.mp3",
+    "cover": "./covers/Лисёнок.jpg"
   },
   {
     "title": "Princess",
@@ -94,6 +130,12 @@
     "artists": "PXSEIDON/PHARAØH",
     "file": "E.T. (Hardstyle) - PXSEIDON.mp3",
     "cover": "./covers/E_T_ _Hardstyle_.jpg"
+  },
+  {
+    "title": "Солнце Монако",
+    "artists": "hornja/cenker/malte",
+    "file": "Солнце Монако - hornja.mp3",
+    "cover": "./covers/Солнце Монако.jpg"
   },
   {
     "title": "Blinding Lights",
