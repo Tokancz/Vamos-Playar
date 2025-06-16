@@ -800,7 +800,7 @@ const visualizer = document.getElementById('visualizer');
 const numBarsPerSide = 24; // total bars = 48
 const bars = [];
 let lastHeights = [];
-const maxBarHeight = 100;
+const maxBarHeight = 80;
 let visualizerInitialized = false;
 
 let audioCtx, analyser, source, dataArray;
