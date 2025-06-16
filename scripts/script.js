@@ -222,7 +222,7 @@ function toggleTab() {
         songTitle.style.textAlign = "center";
         detail.style.width = "80%";
         slider.style.width = "100%";
-        yap.style.gap = "20px";
+        yap.style.gap = "10px";
         document.body.style.height = "100vh";
 
         tabOpen = true;
