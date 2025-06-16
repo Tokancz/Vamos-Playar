@@ -6,6 +6,28 @@ const supabase = window.supabase.createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtYmxrcWdlYWFlenR0aWtweHhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzY3MzMsImV4cCI6MjA2NDUxMjczM30.4TRpAxHihyPQnvuaMOZP5DnGre2OLYu9YQJIn2cXsrE'
 );
 
+fetch('./songs.json')
+    .then(res => res.json())
+    .then(data => {
+        console.log("Loaded songs:", data);
+        songs = data;
+        if (songs.length > 0) {
+            populateSongList();
+            // 👇 Try to restore last played song
+            const savedSongIndex = parseInt(localStorage.getItem("currentSong"));
+            if (!isNaN(savedSongIndex) && savedSongIndex >= 0 && savedSongIndex < songs.length) {
+                currentSong = savedSongIndex;
+            } else {
+                currentSong = 0;
+            }
+            loadSong(currentSong, false);
+            setup();
+        } else {
+            console.error("No songs found in songs.json");
+        }
+    })
+    .catch(err => console.error("Failed to load songs:", err));
+
 // 🔥 SETUP
 let currentSong = 0;
 let playstate = false;
@@ -19,95 +41,6 @@ let tabOpen = false;
 let playStartTime = null;
 let accumulatedPlayTime = 0;
 let songTracked = false;
-
-async function initPlayer() {
-    songs = await loadSongs(); // load from Supabase
-    if (songs.length === 0) {
-        console.error("No songs found in Supabase.");
-        return;
-    }
-
-    populateSongList(); // render list UI
-
-    // Restore saved song or default to first
-    const savedSongIndex = parseInt(localStorage.getItem("currentSong"));
-    if (!isNaN(savedSongIndex) && savedSongIndex >= 0 && savedSongIndex < songs.length) {
-        currentSong = savedSongIndex;
-    } else {
-        currentSong = 0;
-    }
-
-    loadSong(currentSong, false);
-    setup(); // setup event listeners etc
-}
-
-async function loadSongs() {
-  const { data: songs, error } = await supabase
-    .from('songs')
-    .select('*');
-
-  if (error) {
-    console.error('Failed to load songs:', error);
-    return [];
-  }
-
-  const withUrls = songs.map((song) => {
-    return {
-      ...song,
-      fileUrl: `https://bmblkqgeaaezttikpxxf.supabase.co/storage/v1/object/public/songs/${encodeURIComponent(song.file.trim())}`
-    };
-  });
-
-  return withUrls.filter(Boolean);
-}
-
-function populateSongList(filter = "") {
-    const songList = document.getElementById("songList");
-    songList.innerHTML = ""; // Clear previous list
-
-    const normalizedFilter = filter.toLowerCase();
-
-    songs.forEach((song, index) => {
-        const title = song.title.toLowerCase();
-        const artist = song.artists.toLowerCase();
-
-        // Check if filter matches title or artist (or empty filter means show all)
-        if (
-            !normalizedFilter ||
-            title.includes(normalizedFilter) ||
-            artist.includes(normalizedFilter)
-        ) {
-            const songTab = document.createElement("section");
-            songTab.classList.add("songtab");
-            songTab.dataset.index = index;
-
-            // Make sure cover URLs are encoded properly for spaces, special chars etc.
-            const encodedCoverURL = encodeURI(song.cover);
-
-            songTab.innerHTML = `
-                <div class="cover-bg" style="background-image: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(10,10,10,1) 70%), url('${encodedCoverURL}')"></div>
-                <section class="songInfo">
-                    <img src="${encodedCoverURL}" alt="cover" class="songCover">
-                    <section class="songTabDetails">
-                        <h3 class="songName">${song.title}</h3>
-                        <p class="songArtists">${song.artists}</p>
-                    </section>
-                </section>
-                <p class="songDuration">0:00</p>
-            `;
-
-            // On click, load the song by index, with autoplay (true)
-            songTab.addEventListener("click", () => {
-                loadSong(index, true);
-            });
-
-            songList.appendChild(songTab);
-        }
-    });
-
-    //setDurations(); // Update durations after list is populated
-}
-
 
 const play_btn = document.getElementById("play");
 const pause_btn = document.getElementById("pause");
@@ -240,7 +173,312 @@ function setup() {
     }
 }
 
+function toggleTab() {
+    const tab = document.getElementById("tab");
+    const nav = document.getElementById("nav");
+    const sList = document.getElementById("songList");
+    const song = document.getElementById("songCover");
+    const detail = document.getElementById("detail");
+    const icons = document.getElementById("icons");
+    const yap = document.getElementById("yap");
+    const visualizer = document.getElementById("visualizer");
+    const volume = document.querySelector("section.volume");
+    const sliderSection = document.querySelector("section.slider");
+
+    if (!tabOpen) {
+        // OPEN TAB
+        BG.style.backdropFilter = "brightness(1) blur(30px)";
+        nav.style.display = "none";
+        sList.style.display = "none";
+        cross.style.display = "block";
+
+        tab.classList.remove("collapsed");
+        song.classList.remove("collapsed");
+        volume.classList.remove("collapsed");
+        icons.classList.remove("collapsed");
+        sliderSection.classList.remove("collapsed");
+        prevBtn.classList.remove("collapsed");
+        nextBtn.classList.remove("collapsed");
+        shuffleBtn.classList.remove("collapsed");
+        repeatBtn.classList.remove("collapsed");
+        artists.classList.remove("collapsed");
+        visualizer.classList.remove("collapsed");
+
+        tab.classList.add("expanded");
+        song.classList.add("expanded");
+        volume.classList.add("expanded");
+        icons.classList.add("expanded");
+        sliderSection.classList.add("expanded");
+        prevBtn.classList.add("expanded");
+        nextBtn.classList.add("expanded");
+        shuffleBtn.classList.add("expanded");
+        repeatBtn.classList.add("expanded");
+        artists.classList.add("expanded");
+        visualizer.classList.add("expanded");
+
+        coverImage.style.width = "100%";
+        coverImage.style.height = "100%";
+        artists.style.textAlign = "center";
+        songTitle.style.textAlign = "center";
+        detail.style.width = "80%";
+        slider.style.width = "100%";
+        yap.style.gap = "10px";
+        document.body.style.height = "100vh";
+
+        tabOpen = true;
+        localStorage.setItem("tabState", "open");
+    } else {
+        // CLOSE TAB
+        BG.style.backdropFilter = "blur(30px) brightness(.3)";
+        nav.style.display = "flex";
+        sList.style.display = "flex";
+        cross.style.display = "none";
+
+        tab.classList.remove("expanded");
+        song.classList.remove("expanded");
+        volume.classList.remove("expanded");
+        icons.classList.remove("expanded");
+        sliderSection.classList.remove("expanded");
+        prevBtn.classList.remove("expanded");
+        nextBtn.classList.remove("expanded");
+        shuffleBtn.classList.remove("expanded");
+        repeatBtn.classList.remove("expanded");
+        artists.classList.remove("expanded");
+        visualizer.classList.remove("expanded");
+
+        tab.classList.add("collapsed");
+        song.classList.add("collapsed");
+        volume.classList.add("collapsed");
+        icons.classList.add("collapsed");
+        sliderSection.classList.add("collapsed");
+        prevBtn.classList.add("collapsed");
+        nextBtn.classList.add("collapsed");
+        shuffleBtn.classList.add("collapsed");
+        repeatBtn.classList.add("collapsed");
+        artists.classList.add("collapsed");
+        visualizer.classList.add("collapsed");
+
+        coverImage.style = "";
+        artists.style.textAlign = "";
+        songTitle.style.textAlign = "";
+        detail.style = "";
+        yap.style.gap = "";
+        document.body.style.height = "";
+
+        tabOpen = false;
+        localStorage.setItem("tabState", "closed");
+    }
+}
+
+function populateSongList(filter = "") {
+    const songList = document.getElementById("songList");
+    songList.innerHTML = ""; // Clear previous
+
+    const normalizedFilter = filter.toLowerCase();
+
+    songs.forEach((song, index) => {
+        const title = song.title.toLowerCase();
+        const artist = song.artists.toLowerCase();
+
+        if (
+            !normalizedFilter ||
+            title.includes(normalizedFilter) ||
+            artist.includes(normalizedFilter)
+        ) {
+            const songTab = document.createElement("section");
+            songTab.classList.add("songtab");
+            songTab.dataset.index = index;
+
+            const encodedCoverURL = encodeURI(song.cover);
+
+            songTab.innerHTML = `
+                <div class="cover-bg" style="background-image: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(10,10,10,1) 70%), url('${encodedCoverURL}')"></div>
+                <section class="songInfo">
+                    <img src="${encodedCoverURL}" alt="cover" class="songCover">
+                    <section class="songTabDetails">
+                        <h3 class="songName">${song.title}</h3>
+                        <p class="songArtists">${song.artists}</p>
+                    </section>
+                </section>
+                <p class="songDuration">0:00</p>
+            `;
+
+            songTab.addEventListener("click", () => {
+                loadSong(index, true);
+            });
+
+            songList.appendChild(songTab);
+        }
+    });
+
+    setDurations(); // Keep durations visible
+}
+
 let lastCountedTrackId = null;
+
+async function updateListeningStats(forceFinished = false) {
+    if (playStartTime === null) return;
+
+    const elapsedSeconds = Math.floor((Date.now() - playStartTime) / 1000);
+    accumulatedPlayTime += elapsedSeconds;
+    playStartTime = null;
+
+    const song = songs[currentSong];
+    const artist = song.artists;
+    const songDuration = song.duration || 0;
+    const trackId = song.id || song.title; // ✅ Fallback if no ID
+    const progress = song.currentTime || accumulatedPlayTime; // You may adjust this if your `song` has a currentTime field
+    const duration = songDuration;
+
+    const qualifiesAsListened =
+        (progress > 30 || progress > duration * 0.5) &&
+        trackId !== lastCountedTrackId;
+
+    // ✅ Avoid unnecessary work if nothing qualifies
+    const minutesListened = Math.floor(accumulatedPlayTime / 60);
+    accumulatedPlayTime %= 60;
+
+    if (!forceFinished && !qualifiesAsListened && minutesListened === 0) {
+        return;
+    }
+
+    // ✅ Get Supabase user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+        console.error("No user is logged in:", userError);
+        return;
+    }
+
+    // ✅ Fetch user profile
+    const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("minutes_listened, songs_listened_to, artist_counts, song_counts, top_song, unique_songs_listened, first_listen_at")
+        .eq("id", user.id)
+        .single();
+
+    if (profileError) {
+        console.error("Error fetching profile:", profileError);
+        return;
+    }
+
+    const artistCounts = profile.artist_counts || {};
+    const songCounts = profile.song_counts || {};
+    const uniqueSongs = Object.keys(songCounts).length;
+    const newMinutes = (profile.minutes_listened || 0) + minutesListened;
+    const newSongs = qualifiesAsListened
+        ? (profile.songs_listened_to || 0) + 1
+        : (profile.songs_listened_to || 0);
+
+    // ✅ Add artist counts only if valid
+    if (qualifiesAsListened) {
+        lastCountedTrackId = trackId;
+
+        // Update artist counts
+        const individualArtists = artist.split("/").map(a => a.trim());
+        individualArtists.forEach(individualArtist => {
+            artistCounts[individualArtist] = (artistCounts[individualArtist] || 0) + 1;
+        });
+
+        // Update song counts
+        const songTitle = song.title;
+        songCounts[songTitle] = (songCounts[songTitle] || 0) + 1;
+    }
+
+    let topArtist = "Unknown";
+    let topArtistCount = 0;
+    for (const [a, count] of Object.entries(artistCounts)) {
+        if (count > topArtistCount) {
+            topArtist = a;
+            topArtistCount = count;
+        }
+    }
+
+    let topSong = "Unknown";
+    let topSongCount = 0;
+    for (const [title, count] of Object.entries(songCounts)) {
+        if (count > topSongCount) {
+            topSong = title;
+            topSongCount = count;
+        }
+    }
+
+    const now = new Date().toISOString();
+    const firstListen = profile.first_listen_at || now;
+    const lastListen = now;
+
+    // ✅ Update profile in Supabase
+    const updates = {
+        minutes_listened: newMinutes,
+        songs_listened_to: newSongs,
+        artist_counts: artistCounts,
+        top_artist: topArtist,
+        song_counts: songCounts,
+        top_song: topSong,
+        unique_songs_listened: uniqueSongs,
+        first_listen_at: firstListen,
+        last_listen_at: lastListen,
+    };
+
+    // Check if the top song has changed
+    if (profile.top_song !== topSong) {
+        const topSongData = songs.find(s => s.title === topSong);
+        const cover = topSongData?.cover;
+
+        if (cover) {
+            try {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.src = cover;
+
+                img.onload = async () => {
+                    const palette = colorThief.getPalette(img, 10);
+                    const vibrant = pickVibrantColor(palette);
+                    const hexAccent = rgbToHex(...vibrant);
+
+                    updates.top_song_cover = cover;
+                    updates.top_song_accent = hexAccent;
+
+                    const { error: updateError } = await supabase
+                        .from("profiles")
+                        .update(updates)
+                        .eq("id", user.id);
+
+                    if (updateError) {
+                        console.error("Error updating profile with top song cover/accent:", updateError);
+                    } else {
+                        console.log("✅ Profile + top song visual updated.");
+                    }
+                };
+            } catch (err) {
+                console.error("Error loading image for color extraction:", err);
+            }
+        } else {
+            // No cover found — just update text stats
+            const { error: updateError } = await supabase
+                .from("profiles")
+                .update(updates)
+                .eq("id", user.id);
+
+            if (updateError) {
+                console.error("Error updating profile stats:", updateError);
+            } else {
+                console.log("✅ Profile stats updated (no cover).");
+            }
+        }
+    } else {
+        // Top song hasn't changed — update regular stats only
+        const { error: updateError } = await supabase
+            .from("profiles")
+            .update(updates)
+            .eq("id", user.id);
+
+        if (updateError) {
+            console.error("Error updating profile stats:", updateError);
+        } else {
+            console.log("✅ Profile stats updated.");
+        }
+    }
+}
 
 function setDurations() {
     const tabs = document.querySelectorAll(".songtab");
@@ -283,10 +521,10 @@ function setVolume() {
 // 🎶 LOAD A SONG FROM QUEUe
 function loadSong(index, autoplay = false) {
     currentSong = index;
-    localStorage.setItem("currentSong", currentSong);
+    localStorage.setItem("currentSong", currentSong); // ⬅️ Save song index
 
     const track = songs[index];
-    Song.src = track.fileUrl; // 🔁 FIX: use `fileUrl` not `file`
+    Song.src = track.file;
 
     if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
         initVisualizer();
@@ -621,266 +859,3 @@ function animateVisualizer() {
         bars[i].setAttribute('height', `${eased}`);
     }
 }
-
-function toggleTab() {
-    const tab = document.getElementById("tab");
-    const nav = document.getElementById("nav");
-    const sList = document.getElementById("songList");
-    const song = document.getElementById("songCover");
-    const detail = document.getElementById("detail");
-    const icons = document.getElementById("icons");
-    const yap = document.getElementById("yap");
-    const visualizer = document.getElementById("visualizer");
-    const volume = document.querySelector("section.volume");
-    const sliderSection = document.querySelector("section.slider");
-
-    if (!tabOpen) {
-        // OPEN TAB
-        BG.style.backdropFilter = "brightness(1) blur(30px)";
-        nav.style.display = "none";
-        sList.style.display = "none";
-        cross.style.display = "block";
-
-        tab.classList.remove("collapsed");
-        song.classList.remove("collapsed");
-        volume.classList.remove("collapsed");
-        icons.classList.remove("collapsed");
-        sliderSection.classList.remove("collapsed");
-        prevBtn.classList.remove("collapsed");
-        nextBtn.classList.remove("collapsed");
-        shuffleBtn.classList.remove("collapsed");
-        repeatBtn.classList.remove("collapsed");
-        artists.classList.remove("collapsed");
-        visualizer.classList.remove("collapsed");
-
-        tab.classList.add("expanded");
-        song.classList.add("expanded");
-        volume.classList.add("expanded");
-        icons.classList.add("expanded");
-        sliderSection.classList.add("expanded");
-        prevBtn.classList.add("expanded");
-        nextBtn.classList.add("expanded");
-        shuffleBtn.classList.add("expanded");
-        repeatBtn.classList.add("expanded");
-        artists.classList.add("expanded");
-        visualizer.classList.add("expanded");
-
-        coverImage.style.width = "100%";
-        coverImage.style.height = "100%";
-        artists.style.textAlign = "center";
-        songTitle.style.textAlign = "center";
-        detail.style.width = "80%";
-        slider.style.width = "100%";
-        yap.style.gap = "10px";
-        document.body.style.height = "100vh";
-
-        tabOpen = true;
-        localStorage.setItem("tabState", "open");
-    } else {
-        // CLOSE TAB
-        BG.style.backdropFilter = "blur(30px) brightness(.3)";
-        nav.style.display = "flex";
-        sList.style.display = "flex";
-        cross.style.display = "none";
-
-        tab.classList.remove("expanded");
-        song.classList.remove("expanded");
-        volume.classList.remove("expanded");
-        icons.classList.remove("expanded");
-        sliderSection.classList.remove("expanded");
-        prevBtn.classList.remove("expanded");
-        nextBtn.classList.remove("expanded");
-        shuffleBtn.classList.remove("expanded");
-        repeatBtn.classList.remove("expanded");
-        artists.classList.remove("expanded");
-        visualizer.classList.remove("expanded");
-
-        tab.classList.add("collapsed");
-        song.classList.add("collapsed");
-        volume.classList.add("collapsed");
-        icons.classList.add("collapsed");
-        sliderSection.classList.add("collapsed");
-        prevBtn.classList.add("collapsed");
-        nextBtn.classList.add("collapsed");
-        shuffleBtn.classList.add("collapsed");
-        repeatBtn.classList.add("collapsed");
-        artists.classList.add("collapsed");
-        visualizer.classList.add("collapsed");
-
-        coverImage.style = "";
-        artists.style.textAlign = "";
-        songTitle.style.textAlign = "";
-        detail.style = "";
-        yap.style.gap = "";
-        document.body.style.height = "";
-
-        tabOpen = false;
-        localStorage.setItem("tabState", "closed");
-    }
-}
-
-async function updateListeningStats(forceFinished = false) {
-    if (playStartTime === null) return;
-
-    const elapsedSeconds = Math.floor((Date.now() - playStartTime) / 1000);
-    accumulatedPlayTime += elapsedSeconds;
-    playStartTime = null;
-
-    const song = songs[currentSong];
-    const artist = song.artists;
-    const songDuration = song.duration || 0;
-    const trackId = song.id || song.title; // ✅ Fallback if no ID
-    const progress = song.currentTime || accumulatedPlayTime; // You may adjust this if your `song` has a currentTime field
-    const duration = songDuration;
-
-    const qualifiesAsListened =
-        (progress > 30 || progress > duration * 0.5) &&
-        trackId !== lastCountedTrackId;
-
-    // ✅ Avoid unnecessary work if nothing qualifies
-    const minutesListened = Math.floor(accumulatedPlayTime / 60);
-    accumulatedPlayTime %= 60;
-
-    if (!forceFinished && !qualifiesAsListened && minutesListened === 0) {
-        return;
-    }
-
-    // ✅ Get Supabase user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-        console.error("No user is logged in:", userError);
-        return;
-    }
-
-    // ✅ Fetch user profile
-    const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("minutes_listened, songs_listened_to, artist_counts, song_counts, top_song, unique_songs_listened, first_listen_at")
-        .eq("id", user.id)
-        .single();
-
-    if (profileError) {
-        console.error("Error fetching profile:", profileError);
-        return;
-    }
-
-    const artistCounts = profile.artist_counts || {};
-    const songCounts = profile.song_counts || {};
-    const uniqueSongs = Object.keys(songCounts).length;
-    const newMinutes = (profile.minutes_listened || 0) + minutesListened;
-    const newSongs = qualifiesAsListened
-        ? (profile.songs_listened_to || 0) + 1
-        : (profile.songs_listened_to || 0);
-
-    // ✅ Add artist counts only if valid
-    if (qualifiesAsListened) {
-        lastCountedTrackId = trackId;
-
-        // Update artist counts
-        const individualArtists = artist.split("/").map(a => a.trim());
-        individualArtists.forEach(individualArtist => {
-            artistCounts[individualArtist] = (artistCounts[individualArtist] || 0) + 1;
-        });
-
-        // Update song counts
-        const songTitle = song.title;
-        songCounts[songTitle] = (songCounts[songTitle] || 0) + 1;
-    }
-
-    let topArtist = "Unknown";
-    let topArtistCount = 0;
-    for (const [a, count] of Object.entries(artistCounts)) {
-        if (count > topArtistCount) {
-            topArtist = a;
-            topArtistCount = count;
-        }
-    }
-
-    let topSong = "Unknown";
-    let topSongCount = 0;
-    for (const [title, count] of Object.entries(songCounts)) {
-        if (count > topSongCount) {
-            topSong = title;
-            topSongCount = count;
-        }
-    }
-
-    const now = new Date().toISOString();
-    const firstListen = profile.first_listen_at || now;
-    const lastListen = now;
-
-    // ✅ Update profile in Supabase
-    const updates = {
-        minutes_listened: newMinutes,
-        songs_listened_to: newSongs,
-        artist_counts: artistCounts,
-        top_artist: topArtist,
-        song_counts: songCounts,
-        top_song: topSong,
-        unique_songs_listened: uniqueSongs,
-        first_listen_at: firstListen,
-        last_listen_at: lastListen,
-    };
-
-    // Check if the top song has changed
-    if (profile.top_song !== topSong) {
-        const topSongData = songs.find(s => s.title === topSong);
-        const cover = topSongData?.cover;
-
-        if (cover) {
-            try {
-                const img = new Image();
-                img.crossOrigin = "anonymous";
-                img.src = cover;
-
-                img.onload = async () => {
-                    const palette = colorThief.getPalette(img, 10);
-                    const vibrant = pickVibrantColor(palette);
-                    const hexAccent = rgbToHex(...vibrant);
-
-                    updates.top_song_cover = cover;
-                    updates.top_song_accent = hexAccent;
-
-                    const { error: updateError } = await supabase
-                        .from("profiles")
-                        .update(updates)
-                        .eq("id", user.id);
-
-                    if (updateError) {
-                        console.error("Error updating profile with top song cover/accent:", updateError);
-                    } else {
-                        console.log("✅ Profile + top song visual updated.");
-                    }
-                };
-            } catch (err) {
-                console.error("Error loading image for color extraction:", err);
-            }
-        } else {
-            // No cover found — just update text stats
-            const { error: updateError } = await supabase
-                .from("profiles")
-                .update(updates)
-                .eq("id", user.id);
-
-            if (updateError) {
-                console.error("Error updating profile stats:", updateError);
-            } else {
-                console.log("✅ Profile stats updated (no cover).");
-            }
-        }
-    } else {
-        // Top song hasn't changed — update regular stats only
-        const { error: updateError } = await supabase
-            .from("profiles")
-            .update(updates)
-            .eq("id", user.id);
-
-        if (updateError) {
-            console.error("Error updating profile stats:", updateError);
-        } else {
-            console.log("✅ Profile stats updated.");
-        }
-    }
-}
-
-initPlayer(); // start the app
