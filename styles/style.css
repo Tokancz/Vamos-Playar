@@ -113,7 +113,7 @@ section.songInfo {
     width: 90%;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
 }
 .songInfo > img.songCover {
     height: 95%;
@@ -122,8 +122,11 @@ section.songInfo {
     box-shadow: 0 0 5px var(--backdrop);
 }
 section.songTabDetails {
+    width: 55%;
+    height: 100px;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     gap: 10px;
 }
 .songTabDetails p { 
@@ -134,6 +137,7 @@ section.songTabDetails {
     text-align: left;
     font-size: 1.8em;
     font-weight: 500;
+    overflow: hidden;
     filter: drop-shadow(-3px 3px 10px var(--backdrop));
 }
 p.songDuration {
