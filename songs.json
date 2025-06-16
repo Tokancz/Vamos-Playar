@@ -6,6 +6,12 @@
     "cover": "./covers/Untouched.jpg"
   },
   {
+    "title": "MONEY ON THE DASH - SPED UP",
+    "artists": "Elley Duhé/Whethan",
+    "file": "./songs/MONEY ON THE DASH - SPED UP - Elley Duhé.mp3",
+    "cover": "./covers/MONEY ON THE DASH - SPED UP.jpg"
+  },
+  {
     "title": "Слушать!",
     "artists": "EMPTY",
     "file": "./songs/Слушать! - EMPTY.mp3",
@@ -86,7 +92,7 @@
   {
     "title": "Лисёнок",
     "artists": "hornja",
-    "file": "./songs/Лисёнок - hornja.mp3",
+    "file": "./songs/Лисёнок - hornja.mp3",
     "cover": "./covers/Лисёнок.jpg"
   },
   {
