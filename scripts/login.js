@@ -11,7 +11,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   const submitBtn = document.getElementById("submitBtn");
   const title = document.getElementById("formTitle");
   const nameInput = form.querySelector('input[name="name"]');
-  const avatarInput = form.querySelector('input[name="avatar"]');
 
   let isLogin = true;
 
@@ -27,7 +26,6 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     // Toggle visibility
     nameInput.style.display = isLogin ? "none" : "inline";
-    avatarInput.style.display = isLogin ? "none" : "inline";
   };
 
   toggleBtn.addEventListener("click", () => {
@@ -42,7 +40,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     const email = form.email.value;
     const password = form.password.value;
     const name = nameInput.value || null;
-    const avatar = avatarInput.value || null;
 
     if (isLogin) {
      // Login flow
@@ -86,7 +83,6 @@ window.addEventListener("DOMContentLoaded", async () => {
         options: {
           data: {
             username: name,
-            avatar_url: avatar,
           },
         },
       });
@@ -104,16 +100,18 @@ window.addEventListener("DOMContentLoaded", async () => {
       // Insert profile row in your profiles table
       const { error: profileError } = await supabase
         .from("profiles")
-        .insert([
-          {
-            id: user.id,
-            username: name,
-            avatar_url: avatar || null,
-            minutes_listened: 0,
-            top_artist: null,
-            songs_listened_to: 0,
-          },
-        ]);
+        .insert({
+          id: data.user.id,
+          username: name,
+          minutes_listened: 0,
+          songs_listened_to: 0,
+          unique_songs_listened: 0,
+          top_artist: null,
+          top_song: null,
+          top_song_cover: null,
+          top_song_accent: null,
+          times_logged_in: 1
+        });
 
       if (profileError) {
         return alert("Failed to create profile: " + profileError.message);

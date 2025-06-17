@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Render profile
   document.getElementById("profileName").textContent = data.username || "No username";
-  document.getElementById("profileAvatar").src = data.avatar_url || "default-avatar.png";
+  document.getElementById("profileAvatar").src = data.avatar_url || "./images/default-avatar.png";
   document.getElementById("profileEmail").textContent = user.email;
   document.getElementById("profileStats").textContent = `
     Minutes listened: ${data.minutes_listened || 0}
@@ -56,5 +56,59 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("logout").addEventListener("click", async () => {
     await supabase.auth.signOut();
     window.location.href = "auth.html";
+  });
+
+  document.getElementById("changeAvatarBtn").addEventListener("click", () => {
+    document.getElementById("avatarInput").click();
+  });
+
+  document.getElementById("avatarInput").addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`;
+
+    // Upload to Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from('profile-images')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+      });
+
+    if (uploadError) {
+      alert("Upload failed.");
+      console.error(uploadError);
+      return;
+    }
+
+    // Create a signed URL to access the file
+    const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+      .from('profile-images')
+      .createSignedUrl(filePath, 60 * 60); // 1 hour
+
+    if (signedUrlError) {
+      alert("Failed to create signed URL.");
+      console.error(signedUrlError);
+      return;
+    }
+
+    const signedUrl = signedUrlData.signedUrl;
+
+    // Update avatar_url in user profile
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ avatar_url: signedUrl })
+      .eq("id", user.id);
+
+    if (updateError) {
+      alert("Failed to update profile.");
+      console.error(updateError);
+      return;
+    }
+    
+    document.getElementById("profileAvatar").src = signedUrl;
+    alert("Profile picture updated successfully!");
   });
 });
