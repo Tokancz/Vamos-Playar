@@ -76,7 +76,9 @@ main {
   font-weight: 500;
 }
 
-button#logout, button#submitBtn, button#toggleForm {
+button#logout, 
+button#submitBtn, 
+button#toggleForm {
   margin: 10px 5px;
   padding: 10px 20px;
   border-radius: 5px;
@@ -86,11 +88,9 @@ button#logout, button#submitBtn, button#toggleForm {
   cursor: pointer;
   transition: 0.2s ease;
 }
-
 button:hover {
   opacity: 0.8;
 }
-
 section.profileCard {
   position: relative;
   width: 60%;
@@ -99,7 +99,6 @@ section.profileCard {
   background-color: var(--backdrop);
   box-shadow: 5px 5px 15px black;
 }
-
 div.container {
   width: 100%;
   display: flex;
@@ -107,55 +106,54 @@ div.container {
   align-items: center;
   backdrop-filter: brightness(.5);
 }
-
 section.profile {
   width: 100%;
+  min-height: 220px;
   display: flex;
   align-items: center;
   gap: 20px;
   background-color: var(--accent);
-  padding: 50px 0;
   border-radius: 15px 15px 0 0;
 }
-
-.profile img {
+.profile div.profile-image {
   position: absolute;
   width: 180px;
   height: 180px;
   left: 20px;
-  top: 20px;
-  border-radius: 50px;
   filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.3));
+}
+.profile img {
+  border-radius: 50px;
 }
 button#changeAvatarBtn {
   position: absolute;
-  left: 150px;
-  top: 150px;
+  left: 140px;
+  top: 140px;
   padding: 10px;
   border-radius: 50px;
   border: none;
   background: var(--accent);
+  border: 2px solid var(--white);
 }
-
+input[type="file"] {
+  display: none;
+}
 .profile p {
   text-align: left;
   filter: drop-shadow(3px 3px 10px #00000095);
 }
-
 .profile div {
   position: relative;
   left: 220px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 60%;
+  width: 80%;
 }
-
 .profile #profileName {
   font-size: 2em;
   font-weight: 600;
 }
-
 section.stats {
   padding: 20px 0;
   width: 80%;
@@ -168,6 +166,7 @@ section.stats {
 #profileStats {
   text-align: left;
   line-height: 35px;
+  font-size: 1.3em;
 }
 
 @media (width <= 1024px) {
@@ -176,11 +175,16 @@ section.stats {
 }
 @media (width <= 768px) {
   section.profile {flex-direction: column; padding: 20px 0 30px 0;}
-  .profile img {position: static;}
-  button#changeAvatarBtn {position: fixed; border: 2px solid}
+  .profile div.profile-image {position: relative; left: 0;}
+  button#changeAvatarBtn {position: fixed;}
   .profile div {position: static;}
   .profile p {text-align: center;}
-  #profileStats {line-height: 25px; text-align: center;}
+  #profileStats {
+    line-height: 30px; 
+    text-align: center; 
+    position: relative; 
+    left: -30px;
+  }
   main {justify-content: start;}
   section.profileCard {margin-top: 100px;}
   #auth-container {margin-top: 130px;}
@@ -188,4 +192,8 @@ section.stats {
 @media (width <= 425px) {
   *:not(text) {font-size: 1em;}
   body {background-repeat: repeat-y;}
+  section.profileCard {width: 90%;}
+}
+@media (width <= 320px) {
+  #profileStats {font-size: 1.1em;}
 }
