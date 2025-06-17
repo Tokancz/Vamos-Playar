@@ -657,7 +657,6 @@ function restoreVolume() {
     }
 }
 
-
 async function togglePlayPause() {
     if (Song.paused) {
         try {
