@@ -6,28 +6,6 @@ const supabase = window.supabase.createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtYmxrcWdlYWFlenR0aWtweHhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzY3MzMsImV4cCI6MjA2NDUxMjczM30.4TRpAxHihyPQnvuaMOZP5DnGre2OLYu9YQJIn2cXsrE'
 );
 
-fetch('./songs.json')
-    .then(res => res.json())
-    .then(data => {
-        console.log("Loaded songs:", data);
-        songs = data;
-        if (songs.length > 0) {
-            populateSongList();
-            // 👇 Try to restore last played song
-            const savedSongIndex = parseInt(localStorage.getItem("currentSong"));
-            if (!isNaN(savedSongIndex) && savedSongIndex >= 0 && savedSongIndex < songs.length) {
-                currentSong = savedSongIndex;
-            } else {
-                currentSong = 0;
-            }
-            loadSong(currentSong, false);
-            setup();
-        } else {
-            console.error("No songs found in songs.json");
-        }
-    })
-    .catch(err => console.error("Failed to load songs:", err));
-
 // 🔥 SETUP
 let currentSong = 0;
 let playstate = false;
@@ -173,13 +151,101 @@ function setup() {
     }
 }
 
+async function initPlayer() {
+    songs = await loadSongs(); // load from Supabase
+    if (songs.length === 0) {
+        console.error("No songs found in Supabase.");
+        return;
+    }
+
+    populateSongList(); // render list UI
+
+    // Restore saved song or default to first
+    const savedSongIndex = parseInt(localStorage.getItem("currentSong"));
+    if (!isNaN(savedSongIndex) && savedSongIndex >= 0 && savedSongIndex < songs.length) {
+        currentSong = savedSongIndex;
+    } else {
+        currentSong = 0;
+    }
+
+    loadSong(currentSong, false);
+    setup(); // setup event listeners etc
+}
+
+async function loadSongs() {
+  const { data: songs, error } = await supabase
+    .from('songs')
+    .select('*');
+
+  if (error) {
+    console.error('Failed to load songs:', error);
+    return [];
+  }
+
+  const withUrls = songs.map((song) => {
+    return {
+      ...song,
+      fileUrl: `https://bmblkqgeaaezttikpxxf.supabase.co/storage/v1/object/public/songs/${encodeURIComponent(song.file.trim())}`
+    };
+  });
+
+  return withUrls.filter(Boolean);
+}
+
+function populateSongList(filter = "") {
+    const songList = document.getElementById("songList");
+    songList.innerHTML = ""; // Clear previous list
+
+    const normalizedFilter = filter.toLowerCase();
+
+    songs.forEach((song, index) => {
+        const title = song.title.toLowerCase();
+        const artist = song.artists.toLowerCase();
+
+        // Check if filter matches title or artist (or empty filter means show all)
+        if (
+            !normalizedFilter ||
+            title.includes(normalizedFilter) ||
+            artist.includes(normalizedFilter)
+        ) {
+            const songTab = document.createElement("section");
+            songTab.classList.add("songtab");
+            songTab.dataset.index = index;
+
+            // Make sure cover URLs are encoded properly for spaces, special chars etc.
+            const encodedCoverURL = encodeURI(song.cover);
+
+            songTab.innerHTML = `
+                <div class="cover-bg" style="background-image: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(10,10,10,1) 70%), url('${encodedCoverURL}')"></div>
+                <section class="songInfo">
+                    <img src="${encodedCoverURL}" alt="cover" class="songCover">
+                    <section class="songTabDetails">
+                        <h3 class="songName">${song.title}</h3>
+                        <p class="songArtists">${song.artists}</p>
+                    </section>
+                </section>
+                <p class="songDuration">0:00</p>
+            `;
+
+            // On click, load the song by index, with autoplay (true)
+            songTab.addEventListener("click", () => {
+                loadSong(index, true);
+            });
+
+            songList.appendChild(songTab);
+        }
+    });
+
+    //setDurations(); // Update durations after list is populated
+}
+
 // 🎶 LOAD A SONG FROM QUEUe
 function loadSong(index, autoplay = false) {
     currentSong = index;
     localStorage.setItem("currentSong", currentSong); // ⬅️ Save song index
 
     const track = songs[index];
-    Song.src = track.file;
+    Song.src = track.fileUrl;
 
     if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
         initVisualizer();
@@ -221,49 +287,6 @@ function loadSong(index, autoplay = false) {
     });
 }
 
-function populateSongList(filter = "") {
-    const songList = document.getElementById("songList");
-    songList.innerHTML = ""; // Clear previous
-
-    const normalizedFilter = filter.toLowerCase();
-
-    songs.forEach((song, index) => {
-        const title = song.title.toLowerCase();
-        const artist = song.artists.toLowerCase();
-
-        if (
-            !normalizedFilter ||
-            title.includes(normalizedFilter) ||
-            artist.includes(normalizedFilter)
-        ) {
-            const songTab = document.createElement("section");
-            songTab.classList.add("songtab");
-            songTab.dataset.index = index;
-
-            const encodedCoverURL = encodeURI(song.cover);
-
-            songTab.innerHTML = `
-                <div class="cover-bg" style="background-image: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(10,10,10,1) 70%), url('${encodedCoverURL}')"></div>
-                <section class="songInfo">
-                    <img src="${encodedCoverURL}" alt="cover" class="songCover">
-                    <section class="songTabDetails">
-                        <h3 class="songName">${song.title}</h3>
-                        <p class="songArtists">${song.artists}</p>
-                    </section>
-                </section>
-                <p class="songDuration">0:00</p>
-            `;
-
-            songTab.addEventListener("click", () => {
-                loadSong(index, true);
-            });
-
-            songList.appendChild(songTab);
-        }
-    });
-
-    setDurations(); // Keep durations visible
-}
 
 let lastCountedTrackId = null;
 
@@ -858,3 +881,5 @@ async function updateListeningStats(forceFinished = false) {
         }
     }
 }
+
+initPlayer(); // start the app
