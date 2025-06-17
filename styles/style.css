@@ -4,7 +4,7 @@
     --primary: #FFFFFF90;
     --accent: #C04065;
     --white: #e8e7e7;
-    --backdrop: #101010A0;
+    --backdrop: #101010b2;
     --tab: #101010F9;
 }
 *:not(text) {
@@ -31,6 +31,9 @@ main {
     align-items: center;
 }
 nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     height: 80px;
     display: flex;
     padding: 0 20px;
