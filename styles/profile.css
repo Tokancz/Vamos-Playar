@@ -124,6 +124,8 @@ section.profile {
 }
 .profile img {
   border-radius: 50px;
+  width: 180px;
+  height: 180px;
 }
 button#changeAvatarBtn {
   position: absolute;
