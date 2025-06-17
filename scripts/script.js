@@ -182,14 +182,7 @@ async function loadSongs() {
     return [];
   }
 
-  const withUrls = songs.map((song) => {
-    return {
-      ...song,
-      fileUrl: `https://bmblkqgeaaezttikpxxf.supabase.co/storage/v1/object/public/songs/${encodeURIComponent(song.file.trim())}`
-    };
-  });
-
-  return withUrls.filter(Boolean);
+  return songs.filter(Boolean);
 }
 
 function populateSongList(filter = "") {
@@ -240,15 +233,61 @@ function populateSongList(filter = "") {
 }
 
 // 🎶 LOAD A SONG FROM QUEUe
-function loadSong(index, autoplay = false) {
-    currentSong = index;
-    localStorage.setItem("currentSong", currentSong); // ⬅️ Save song index
+async function loadSong(index, autoplay = false, useWebAudio = false) {
+  currentSong = index;
+  localStorage.setItem("currentSong", currentSong);
 
-    const track = songs[index];
-    Song.src = track.fileUrl;
+  const track = songs[index];
+  if (!track) return;
+
+  if (useWebAudio) {
+    // Stop current Song audio playback
+    Song.pause();
+    Song.src = "";
+
+    await playPrivateSongWithWebAudio(track.file.trim());
+    
+    // Update UI like title, cover, etc.
+    songTitle.textContent = track.title;
+    artists.textContent = track.artists;
+    BG.style.backgroundImage = `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10,10,10,0.4) 100%), url('${track.cover}')`;
+    coverImage.src = track.cover;
+
+    // Update media session metadata as well
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: track.title,
+            artist: track.artists,
+            artwork: [{ src: track.cover, sizes: '512x512', type: 'image/jpeg' }]
+        });
+    }
+
+    // UI toggles for play/pause buttons could be set here
+    play_btn.style.display = "none";
+    pause_btn.style.display = "block";
+  } else {
+    // Your existing loadSong logic:
+    try {
+      const { data, error } = await supabase
+          .storage
+          .from('songs')
+          .createSignedUrl(track.file.trim(), 60);
+
+      if (error || !data?.signedUrl) {
+          console.error("Failed to get signed URL:", error);
+          return;
+      }
+
+      Song.src = data.signedUrl;
+      console.log("Playing from private bucket:", data.signedUrl);
+
+    } catch (err) {
+      console.error("Error loading song:", err);
+      return;
+    }
 
     if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
-        initVisualizer();
+    initVisualizer();
 
     Song.load();
     songTitle.textContent = track.title;
@@ -271,22 +310,68 @@ function loadSong(index, autoplay = false) {
         navigator.mediaSession.metadata = new MediaMetadata({
             title: track.title,
             artist: track.artists,
-            artwork: [
-                { src: track.cover, sizes: '512x512', type: 'image/jpeg' }
-            ]
+            artwork: [{ src: track.cover, sizes: '512x512', type: 'image/jpeg' }]
         });
     }
-    // ✅ Highlight the active song in the list
-    const songTabs = document.querySelectorAll('.songtab');
-    songTabs.forEach((tab, i) => {
-        if (i === index) {
-            tab.classList.add('active');
-        } else {
-            tab.classList.remove('active');
-        }
-    });
+  }
+
+  // Update active song tab UI
+  const songTabs = document.querySelectorAll('.songtab');
+  songTabs.forEach((tab, i) => {
+      tab.classList.toggle('active', i === index);
+  });
 }
 
+
+async function playPrivateSongWithWebAudio(songPath) {
+  // 1. Get the signed URL from Supabase Storage
+  const { data, error } = await supabase
+    .storage
+    .from('songs') // your bucket name
+    .createSignedUrl(songPath, 60); // URL valid for 60 seconds
+
+  if (error) {
+    console.error('Failed to get signed URL:', error.message);
+    return;
+  }
+
+  const signedUrl = data.signedUrl;
+
+  try {
+    // 2. Fetch the audio data as ArrayBuffer
+    const response = await fetch(signedUrl);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const arrayBuffer = await response.arrayBuffer();
+
+    // 3. Create and resume AudioContext
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') {
+      await audioCtx.resume();
+    }
+
+    // 4. Decode the audio data
+    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+    // 5. Create a buffer source node
+    const source = audioCtx.createBufferSource();
+    source.buffer = audioBuffer;
+
+    // 6. Connect to destination (speakers)
+    source.connect(audioCtx.destination);
+
+    // 7. Start playback
+    source.start(0);
+
+    // Optional: When playback ends
+    source.onended = () => {
+      console.log('Playback finished');
+      audioCtx.close();
+    };
+  } catch (err) {
+    console.error('Error playing audio with Web Audio API:', err);
+  }
+}
 
 let lastCountedTrackId = null;
 
