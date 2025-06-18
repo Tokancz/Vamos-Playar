@@ -58,7 +58,8 @@ for filename in os.listdir(SONGS_DIR):
     # Upload song to Supabase
     song_storage_path = f"{filename}"
     with open(filepath, "rb") as f:
-        supabase.storage.from_("songs").upload(song_storage_path, f, file_options={"upsert": True})
+        supabase.storage.from_("songs").upload(song_storage_path, f)
+
     song_public_url = supabase.storage.from_("songs").get_public_url(song_storage_path)
 
     # Upload cover to Supabase
