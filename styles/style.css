@@ -87,6 +87,7 @@ section.songList {
     flex-direction: column;
     align-items: center;
     margin-top: 10px;
+    margin-bottom: 30px;
 }
 section.songtab {
     width: 95%;
