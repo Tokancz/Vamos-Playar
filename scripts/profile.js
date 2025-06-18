@@ -25,7 +25,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Render profile
   document.getElementById("profileName").textContent = data.username || "No username";
-  document.getElementById("profileAvatar").src = data.avatar_url || "./images/default-avatar.png";
   document.getElementById("profileEmail").textContent = user.email;
   document.getElementById("profileStats").textContent = `
     Minutes listened: ${data.minutes_listened || 0}
@@ -35,6 +34,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     Top song: ${data.top_song || "N/A"}
     Times logged in: ${data.times_logged_in || 0}
   `;
+  if (data.avatar_url) {
+    const { data: signedUrlData, error: signedUrlError } = await supabase
+      .storage
+      .from('profile-images')
+      .createSignedUrl(data.avatar_url, 60 * 60); // 1 hour
+
+    if (!signedUrlError && signedUrlData?.signedUrl) {
+      document.getElementById("profileAvatar").src = signedUrlData.signedUrl;
+    } else {
+      document.getElementById("profileAvatar").src = "./images/default-avatar.png";
+    }
+  } else {
+    document.getElementById("profileAvatar").src = "./images/default-avatar.png";
+  }
+
 
   // 🎨 Apply visual styling from top song
   if (data.top_song_cover) {
@@ -99,7 +113,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Update avatar_url in user profile
     const { error: updateError } = await supabase
       .from("profiles")
-      .update({ avatar_url: signedUrl })
+      .update({ avatar_url: filePath })
       .eq("id", user.id);
 
     if (updateError) {
