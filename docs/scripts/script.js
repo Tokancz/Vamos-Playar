@@ -158,6 +158,7 @@ async function initPlayer() {
         return;
     }
 
+    await preloadCoverURLs();
     populateSongList(); // render list UI
 
     // Restore saved song or default to first
@@ -185,51 +186,77 @@ async function loadSongs() {
   return songs.filter(Boolean);
 }
 
+async function preloadCoverURLs() {
+  for (let song of songs) {
+    try {
+      const { data, error } = await supabase
+        .storage
+        .from('covers')
+        .createSignedUrl(song.cover.trim(), 60);
+      if (error || !data?.signedUrl) {
+        console.warn("Could not load cover for", song.cover);
+        song.coverUrl = "./default-cover.jpg"; // fallback local image or empty string
+      } else {
+        song.coverUrl = data.signedUrl;
+      }
+    } catch {
+      song.coverUrl = "./images/default-cover.jpg";
+    }
+  }
+}
+
 function populateSongList(filter = "") {
-    const songList = document.getElementById("songList");
-    songList.innerHTML = ""; // Clear previous list
+  const songList = document.getElementById("songList");
+  songList.innerHTML = "";
 
-    const normalizedFilter = filter.toLowerCase();
+  const normalizedFilter = filter.toLowerCase();
 
-    songs.forEach((song, index) => {
-        const title = song.title.toLowerCase();
-        const artist = song.artists.toLowerCase();
+  songs.forEach((song, index) => {
+    const title = song.title.toLowerCase();
+    const artist = song.artists.toLowerCase();
 
-        // Check if filter matches title or artist (or empty filter means show all)
-        if (
-            !normalizedFilter ||
-            title.includes(normalizedFilter) ||
-            artist.includes(normalizedFilter)
-        ) {
-            const songTab = document.createElement("section");
-            songTab.classList.add("songtab");
-            songTab.dataset.index = index;
+    if (
+      !normalizedFilter ||
+      title.includes(normalizedFilter) ||
+      artist.includes(normalizedFilter)
+    ) {
+        const songTab = document.createElement("section");
+        songTab.classList.add("songtab");
+        songTab.dataset.index = index;
 
-            // Make sure cover URLs are encoded properly for spaces, special chars etc.
-            const encodedCoverURL = encodeURI(song.cover);
+        const coverUrl = song.coverUrl || "./images/default-cover.jpg";
 
-            songTab.innerHTML = `
-                <div class="cover-bg" style="background-image: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(10,10,10,1) 70%), url('${encodedCoverURL}')"></div>
-                <section class="songInfo">
-                    <img src="${encodedCoverURL}" alt="cover" class="songCover">
-                    <section class="songTabDetails">
-                        <h3 class="songName">${song.title}</h3>
-                        <p class="songArtists">${song.artists}</p>
-                    </section>
-                </section>
-                <p class="songDuration">0:00</p>
-            `;
+        songTab.innerHTML = `
+        <div class="cover-bg" style="background-image: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(10,10,10,1) 70%), url('${coverUrl}')"></div>
+        <section class="songInfo">
+            <section class="songTabDetails">
+            <h3 class="songName">${song.title}</h3>
+            <p class="songArtists">${song.artists}</p>
+            </section>
+        </section>
+        <p class="songDuration">0:00</p>
+        `;
 
-            // On click, load the song by index, with autoplay (true)
-            songTab.addEventListener("click", () => {
-                loadSong(index, true);
-            });
+        const img = document.createElement("img");
+        img.src = coverUrl;
+        img.alt = "cover";
+        img.classList.add("songCover");
+        img.onerror = () => {
+        img.src = "./images/default-cover.jpg";
+        };
 
-            songList.appendChild(songTab);
-        }
-    });
+        // Append img to .songInfo
+        songTab.querySelector(".songInfo").prepend(img);
 
-    setDurations(); 
+        songTab.addEventListener("click", () => {
+        loadSong(index, true);
+        });
+
+        songList.appendChild(songTab);
+    }
+  });
+
+  setDurations();
 }
 
 // 🎶 LOAD A SONG FROM QUEUe
@@ -240,22 +267,43 @@ async function loadSong(index, autoplay = false) {
   const track = songs[index];
   if (!track) return;
 
+  let songData, songError, coverData, coverError;
+
   try {
     // Get a signed URL for the private song file
-    const { data, error } = await supabase
+    ({ data: songData, error: songError } = await supabase
       .storage
-      .from('songs')  // Your private bucket name
-      .createSignedUrl(track.file.trim(), 60); // 60 sec expiry
+      .from('songs')
+      .createSignedUrl(track.file.trim(), 60));
 
-    if (error || !data?.signedUrl) {
-      console.error("Failed to get signed URL:", error);
+    if (songError || !songData?.signedUrl) {
+      console.error("Failed to get signed URL for song:", songError);
       return;
     }
 
-    Song.src = data.signedUrl;
-    console.log("🔒 Playing from private bucket:", data.signedUrl);
+    // Get a signed URL for the cover image
+    ({ data: coverData, error: coverError } = await supabase
+      .storage
+      .from('covers')
+      .createSignedUrl(track.cover.trim(), 60 * 60));
+
+    if (coverError || !coverData?.signedUrl) {
+      console.error("Failed to get signed URL for cover:", coverError);
+      return;
+    }
+
+    Song.src = songData.signedUrl;
+    console.log("🔒 Playing from private bucket:", songData.signedUrl);
+
+    // Use signed URL for cover image
+    BG.style.backgroundImage = `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10,10,10,0.4) 100%), url('${coverData.signedUrl}')`;
+    coverImage.src = coverData.signedUrl;
+
+    songTitle.textContent = track.title;
+    artists.textContent = track.artists;
+
   } catch (err) {
-    console.error("Error loading song:", err);
+    console.error("Error loading song or cover:", err);
     return;
   }
 
@@ -265,12 +313,6 @@ async function loadSong(index, autoplay = false) {
 
   initVisualizer();
   Song.load();
-
-  songTitle.textContent = track.title;
-  artists.textContent = track.artists;
-
-  BG.style.backgroundImage = `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10,10,10,0.4) 100%), url('${track.cover}')`;
-  coverImage.src = track.cover;
 
   if (autoplay || playstate) {
     Song.play();
@@ -286,7 +328,7 @@ async function loadSong(index, autoplay = false) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: track.title,
       artist: track.artists,
-      artwork: [{ src: track.cover, sizes: '512x512', type: 'image/jpeg' }]
+      artwork: [{ src: coverData.signedUrl, sizes: '512x512', type: 'image/jpeg' }]
     });
   }
 
@@ -296,6 +338,7 @@ async function loadSong(index, autoplay = false) {
     tab.classList.toggle('active', i === index);
   });
 }
+
 
 let lastCountedTrackId = null;
 
@@ -517,6 +560,7 @@ function triggerAnimation() {
 
 const colorThief = new ColorThief();
 const img = document.getElementById('coverImage');
+img.crossOrigin = "anonymous";
 
 img.addEventListener('load', async () => {
     console.log('Image loaded:', img.src);
