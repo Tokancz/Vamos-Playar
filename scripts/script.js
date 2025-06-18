@@ -229,7 +229,7 @@ function populateSongList(filter = "") {
         }
     });
 
-    //setDurations(); // Update durations after list is populated
+    setDurations(); 
 }
 
 // 🎶 LOAD A SONG FROM QUEUe
@@ -297,51 +297,28 @@ async function loadSong(index, autoplay = false) {
   });
 }
 
-async function playPrivateSongWithWebAudio(songPath) {
-  try {
-    const { data, error } = await supabase
-      .storage
-      .from('songs')
-      .createSignedUrl(songPath.trim(), 60);
-
-    if (error || !data?.signedUrl) {
-      console.error("Failed to get signed URL:", error);
-      return;
-    }
-
-    const response = await fetch(data.signedUrl);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-    const arrayBuffer = await response.arrayBuffer();
-
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') await audioCtx.resume();
-
-    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-    const source = audioCtx.createBufferSource();
-    source.buffer = audioBuffer;
-    source.connect(audioCtx.destination);
-    source.start(0);
-
-    source.onended = () => {
-      console.log("Playback finished");
-      audioCtx.close();
-    };
-  } catch (err) {
-    console.error("Error playing private song with Web Audio API:", err);
-  }
-}
-
-
 let lastCountedTrackId = null;
 
-function setDurations() {
+async function setDurations() {
     const tabs = document.querySelectorAll(".songtab");
 
-    tabs.forEach((tab, index) => {
-        const audio = new Audio();
+    tabs.forEach(async (tab) => {
         const tabIndex = parseInt(tab.dataset.index);
-        audio.src = songs[tabIndex].file;
+        const filePath = songs[tabIndex].file.trim();
+
+        // Get signed URL from Supabase
+        const { data, error } = await supabase
+            .storage
+            .from('songs')
+            .createSignedUrl(filePath, 60);
+
+        if (error || !data?.signedUrl) {
+            console.error("Error getting signed URL for duration:", error);
+            return;
+        }
+
+        const audio = new Audio();
+        audio.src = data.signedUrl;
 
         audio.addEventListener("loadedmetadata", () => {
             const dur = audio.duration;
