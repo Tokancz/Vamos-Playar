@@ -34,7 +34,13 @@
             <input type="text" id="searchInput" placeholder="Search song or artist..." />
             <i class="fa-solid fa-magnifying-glass"></i>
         </section>
-        <a href="auth.html"><i class="fa-solid fa-user" id="user"></i></a>
+        <div>
+            <label for="file-upload" class="upload-btn">
+                <i class="fa-solid fa-upload"></i>
+            </label>
+            <input type="file" id="file-upload" accept=".mp3" style="display: none;" />
+            <a href="auth.html"><i class="fa-solid fa-user" id="user"></i></a>
+        </div>
     </nav>
     <main>
         <section class="tab collapsed" id="tab">
@@ -77,6 +83,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/music-metadata-browser@2.6.1/dist/music-metadata-browser.umd.min.js"></script>
+    <script src="scripts/jsmediatags.min.js"></script>
     <script src="scripts/script.js"></script>
 </body>
 </html>

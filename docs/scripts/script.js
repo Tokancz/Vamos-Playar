@@ -339,6 +339,90 @@ async function loadSong(index, autoplay = false) {
   });
 }
 
+document.getElementById('file-upload').addEventListener('change', async (event) => {
+  const file = event.target.files[0];
+  if (!file || !file.name.toLowerCase().endsWith('.mp3')) return;
+
+  try {
+    // 1. Upload mp3 file to 'songs' bucket
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('songs')
+      .upload(`songs/${file.name}`, file, { upsert: true });
+
+    if (uploadError) throw new Error('Song upload failed: ' + uploadError.message);
+
+    // 2. Extract metadata with jsmediatags
+    const metadata = await new Promise((resolve, reject) => {
+      jsmediatags.read(file, {
+        onSuccess: tag => resolve(tag),
+        onError: err => reject(err)
+      });
+    });
+
+    const tags = metadata.tags || {};
+    const title = tags.title || file.name.replace(/\.mp3$/i, '');
+    const artist = tags.artist || 'Unknown Artist';
+
+    // 3. Extract cover image blob if exists
+    let coverPath = '';
+    if (tags.picture) {
+      const picture = tags.picture;
+      const base64String = arrayBufferToBase64(picture.data);
+      const blob = base64ToBlob(base64String, picture.format || 'image/jpeg');
+
+      // Upload cover image to 'covers' bucket
+      const coverFileName = file.name.replace(/\.mp3$/i, '') + '.jpg';
+      const { error: coverError } = await supabase.storage
+        .from('covers')
+        .upload(`covers/${coverFileName}`, blob, { upsert: true });
+
+      if (coverError) {
+        console.warn('Cover upload failed:', coverError.message);
+      } else {
+        coverPath = `covers/${coverFileName}`;
+      }
+    }
+
+    // 4. Insert song record into 'songs' table
+    const { error: insertError } = await supabase.from('songs').insert([{
+      title,
+      artists: artist,
+      file: `songs/${file.name}`,
+      cover: coverPath,
+    }]);
+
+    if (insertError) throw new Error('Metadata insert failed: ' + insertError.message);
+
+    alert('✅ Upload successful!');
+    location.reload();
+
+  } catch (err) {
+    console.error(err);
+    alert('❌ Upload failed: ' + err.message);
+  }
+});
+
+// Helpers for cover image conversion
+
+function arrayBufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
+}
+
+function base64ToBlob(base64, mime) {
+  const byteChars = atob(base64);
+  const byteNumbers = new Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) {
+    byteNumbers[i] = byteChars.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  return new Blob([byteArray], { type: mime });
+}
 
 let lastCountedTrackId = null;
 

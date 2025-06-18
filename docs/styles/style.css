@@ -71,12 +71,17 @@ section.searchbar {
 .searchbar input[type="text"]:focus {
     filter: brightness(1.5);
 }
-i#user {
+nav div {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+nav div i {
     font-size: 2em;
     color: var(--accent);
     transition: .3s;
 }
-i#user:hover {
+nav div i:hover {
     filter: brightness(1.1);
 }
 section.songList {
@@ -164,7 +169,7 @@ p.songDuration {
 }
 section.tab {
     position:sticky;
-    top: 77dvh;
+    top: 80dvh;
     width: 95%;
     height: 150px;
     display: flex;
