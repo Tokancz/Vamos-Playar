@@ -605,65 +605,121 @@ function applyAccentColorToMask(selector, accentColor) {
 const visualizer = document.getElementById('visualizer');
 const numBarsPerSide = 24; // total bars = 48
 const bars = [];
-let lastHeights = [];
+const lastHeights = [];
 const maxBarHeight = 80;
-let visualizerInitialized = false;
+let visualizerInitialized = false;  // <-- Add this line here
 
-let audioCtx, analyser, source, dataArray;
+let audioCtx, analyser, dataArray;
 
-function initVisualizer() {
-    if (visualizerInitialized) return;
-    visualizerInitialized = true;
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 128;
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-        source = audioCtx.createMediaElementSource(Song);
-        source.connect(analyser);
-        analyser.connect(audioCtx.destination);
+async function initVisualizer() {
+  if (!songs[currentSong]) return;
+
+  const track = songs[currentSong];
+  const { data, error } = await supabase
+    .storage
+    .from('songs')
+    .createSignedUrl(track.file.trim(), 60);
+
+  if (error || !data?.signedUrl) {
+    console.error("Visualizer: Failed to get signed URL:", error);
+    return;
+  }
+
+  try {
+    const response = await fetch(data.signedUrl);
+    const arrayBuffer = await response.arrayBuffer();
+
+    if (window.audioCtx) {
+      await window.audioCtx.close();
+    }
+    window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    await window.audioCtx.resume();
+
+    const audioBuffer = await window.audioCtx.decodeAudioData(arrayBuffer);
+    const bufferSource = window.audioCtx.createBufferSource();
+    bufferSource.buffer = audioBuffer;
+
+    analyser = window.audioCtx.createAnalyser();
+    bufferSource.connect(analyser);
+    analyser.connect(window.audioCtx.destination);
+
+    // Start and immediately stop so it doesn't play
+    bufferSource.start(0);
+    bufferSource.stop();
+
+    // Assign global analyzer to local analyser
+    window.analyser = analyser;
+
+    // Init dataArray based on analyser
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    // Initialize bars only once
+    if (!visualizerInitialized) {
+      createVisualizerBars();
+      visualizerInitialized = true;
+      animateVisualizer();
     }
 
-    visualizer.innerHTML = '';
-    bars.length = 0;
-    lastHeights.length = 0;
+  } catch (err) {
+    console.error("Visualizer error:", err);
+  }
+}
 
-    const totalBars = numBarsPerSide * 2;
+// Create SVG or div bars for the visualizer
+function createVisualizerBars() {
+  const svgNS = "http://www.w3.org/2000/svg";
 
-    for (let i = 0; i < totalBars; i++) {
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x', (i * (100 / totalBars)).toString());
-        rect.setAttribute('width', (100 / totalBars - 1).toString());
-        rect.setAttribute('y', '50');
-        rect.setAttribute('height', '0');
-        rect.setAttribute('fill', 'var(--accent)');
-        rect.setAttribute('rx', '1.5');
-        rect.setAttribute('ry', '1.5');
-        bars.push(rect);
-        lastHeights.push(0);
-        visualizer.appendChild(rect);
-    }
+  // Clear previous bars if any
+  visualizer.innerHTML = '';
 
-    animateVisualizer();
+  const totalBars = numBarsPerSide * 2;
+  const barWidth = 4;
+  const barGap = 2;
+  const visualizerHeight = 100; // Adjust if needed
+
+  // Set visualizer container size (if SVG)
+  visualizer.setAttribute('width', `${(barWidth + barGap) * totalBars}`);
+  visualizer.setAttribute('height', `${visualizerHeight}`);
+
+  for (let i = 0; i < totalBars; i++) {
+    const rect = document.createElementNS(svgNS, 'rect');
+    rect.setAttribute('x', `${i * (barWidth + barGap)}`);
+    rect.setAttribute('y', `${visualizerHeight}`); // start from bottom
+    rect.setAttribute('width', `${barWidth}`);
+    rect.setAttribute('height', `0`);
+    rect.setAttribute('fill', '#00f'); // Or any color you want
+
+    visualizer.appendChild(rect);
+    bars.push(rect);
+    lastHeights.push(0);
+  }
 }
 
 function animateVisualizer() {
+  if (!window.analyser) {
+    // Not ready yet
     requestAnimationFrame(animateVisualizer);
-    analyser.getByteFrequencyData(dataArray);
+    return;
+  }
 
-    for (let i = 0; i < numBarsPerSide * 2; i++) {
-        const value = dataArray[Math.abs(numBarsPerSide - 1 - i)] ?? 0;
-        const targetHeight = (value / 255) * maxBarHeight;
+  analyser = window.analyser;
+  analyser.getByteFrequencyData(dataArray);
 
-        const currentHeight = lastHeights[i];
-        const easingFactor = 0.1 + (currentHeight / maxBarHeight) * 0.4; // range: 0.1 to 0.5
-        const eased = currentHeight + (targetHeight - currentHeight) * easingFactor;
+  for (let i = 0; i < numBarsPerSide * 2; i++) {
+    const value = dataArray[Math.abs(numBarsPerSide - 1 - i)] ?? 0;
+    const targetHeight = (value / 255) * maxBarHeight;
 
-        lastHeights[i] = eased;
+    const currentHeight = lastHeights[i];
+    const easingFactor = 0.1 + (currentHeight / maxBarHeight) * 0.4; // range: 0.1 to 0.5
+    const eased = currentHeight + (targetHeight - currentHeight) * easingFactor;
 
-        bars[i].setAttribute('y', `${100 - eased}`);
-        bars[i].setAttribute('height', `${eased}`);
-    }
+    lastHeights[i] = eased;
+
+    bars[i].setAttribute('y', `${100 - eased}`);
+    bars[i].setAttribute('height', `${eased}`);
+  }
+
+  requestAnimationFrame(animateVisualizer);
 }
 
 function toggleTab() {
