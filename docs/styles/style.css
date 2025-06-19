@@ -427,10 +427,11 @@ section.slider.expanded {
 @media (width <= 425px) {
     *:not(text) { font-size: .98em; }
     body { background-size: 200%;}
-    nav {padding: 0px;}
+    nav {padding: 0px; gap: 5px;}
+    nav div {gap: 5px;}
     section.searchbar {width: 200px;}
     i#user {padding: 10px;}
-    #tab.expanded {width: 80%; font-size: 1.5em; top: 73svh;}
+    #tab.expanded {width: 80%; font-size: 1.5em; top: 73dvh;}
     #songCover.collapsed {width: 85%;}
     #tab.collapsed {width: 90%; gap: 10px; top: 82dvh;}
     section.songList {top: -110px;}
@@ -457,7 +458,6 @@ section.slider.expanded {
     *:not(text) { font-size: .95em; }
     body { background-size: 250%;}
     #tab.expanded {width: 80%;bottom: 15%;}
-    #tab.expanded {top: 70svh;}
     #songCover.expanded {width: 80%;}
 }
 /*responzivita*/
