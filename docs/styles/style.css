@@ -425,7 +425,7 @@ section.slider.expanded {
     #visualizer.expanded {width: 100%; top: 10%; height: 200px;}
 }
 @media (width <= 425px) {
-    *:not(text) { font-size: .98em; }
+    *:not(text) { font-size: .95em; }
     body { background-size: 200%;}
     nav {padding: 0px; gap: 5px;}
     nav div {gap: 5px;}
@@ -435,7 +435,7 @@ section.slider.expanded {
     #songCover.collapsed {width: 85%;}
     #tab.collapsed {width: 90%; gap: 10px; top: 82dvh;}
     section.songList {top: -110px;}
-    section.songtab {width: 90%; height: 100px;}
+    section.songtab {width: 90%; height: 80px;}
     img.album_cover {height: 100px;}
     section.songInfo {width: 85%;}
     p.songDuration {width: 15%;}
@@ -455,7 +455,7 @@ section.slider.expanded {
     
 }
 @media (width <= 320px) {
-    *:not(text) { font-size: .95em; }
+    *:not(text) { font-size: .92em; }
     body { background-size: 250%;}
     #tab.expanded {width: 80%;bottom: 15%;}
     #songCover.expanded {width: 80%;}
